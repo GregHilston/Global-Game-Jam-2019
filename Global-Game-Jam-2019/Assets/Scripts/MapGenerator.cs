@@ -51,49 +51,50 @@ public class MapGenerator : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // 2d has a zero z plane
-        Vector3 startingPositionTopLeft = this.camera.ScreenToWorldPoint(new Vector3(0, this.camera.pixelHeight, this.camera.nearClipPlane));
-
-        Color[] tileColors = { Color.black, Color.gray, Color.white, Color.cyan, new Color(255, 99, 71), Color.yellow };
-
-        for (int row = 0; row < this.board.Length; row++)
+        if (board != null)
         {
-            for (int column = 0; column < this.board[row].Length; column++)
+            // 2d has a zero z plane
+            Vector3 startingPositionTopLeft = this.camera.ScreenToWorldPoint(new Vector3(0, this.camera.pixelHeight, this.camera.nearClipPlane));
+
+            Color[] tileColors = { Color.black, Color.gray, Color.white, Color.cyan, new Color(255, 99, 71), Color.yellow };
+
+            for (int row = 0; row < this.board.Length; row++)
             {
-                switch (this.board[row][column])
+                for (int column = 0; column < this.board[row].Length; column++)
                 {
-                    case TileType.Wall:
-                        {
+                    switch (this.board[row][column])
+                    {
+                        case TileType.Wall:
+                            {
+                                Gizmos.color = tileColors[0];
+                                break;
+                            }
+                        case TileType.Floor:
+                            {
+                                Gizmos.color = tileColors[1];
+                                break;
+                            }
+                        case TileType.ExternalDoor:
+                            {
+                                Gizmos.color = tileColors[2];
+                                break;
+                            }
+                        case TileType.RoomPoint:
+                            {
+                                Gizmos.color = tileColors[3];
+                                break;
+                            }
+                    }
 
-                            Gizmos.color = tileColors[0];
-                            break;
-                        }
-                    case TileType.Floor:
-                        {
-                            Gizmos.color = tileColors[1];
-                            break;
-                        }
-                    case TileType.ExternalDoor:
-                        {
-                            Gizmos.color = tileColors[2];
-                            break;
-                        }
-                    case TileType.RoomPoint:
-                        {
-                            Gizmos.color = tileColors[3];
-                            break;
-                        }
+                    const float sharedUnit = 1.0f;
+                    const float baseXOffset = sharedUnit;
+                    const float baseYOffset = sharedUnit;
+                    const float size = 0.8f;
+
+                    Gizmos.DrawCube(new Vector3(startingPositionTopLeft.x + baseXOffset * row, startingPositionTopLeft.y + baseYOffset * -column, 0.0f), new Vector3(size, size, size));
                 }
-
-                const float sharedUnit = 1.0f;
-                const float baseXOffset = sharedUnit;
-                const float baseYOffset = sharedUnit;
-                const float size = 0.8f;
-
-               Gizmos.DrawCube(new Vector3(startingPositionTopLeft.x + baseXOffset * row, startingPositionTopLeft.y + baseYOffset * -column, 0.0f), new Vector3(size, size, size));
             }
         }
-
     }
 
     /// <summary>
@@ -122,35 +123,35 @@ public class MapGenerator : MonoBehaviour
 
     private int CalculateNumberOfRooms(string input)
     {
-        const int indexOfInterest = 0;
+        // const int indexOfInterest = 0;
 
         return 6;
     }
 
     private int CalculateNumberOfPeopleHome(string input)
     {
-        const int indexOfInterest = 1;
+        // const int indexOfInterest = 1;
 
         return 1;
     }
 
     private int CalculateNumberOfPetsHome(string input)
     {
-        const int indexOfInterest = 2;
+        // const int indexOfInterest = 2;
 
         return 1;
     }
 
     private int CalculateNumberOfObjectsToMove(string input)
     {
-        const int indexOfInterest = 3;
+        // const int indexOfInterest = 3;
 
         return 3;
     }
 
     private int CalculateNumberOfCameras(string input)
     {
-        const int indexOfInterest = 4;
+        // const int indexOfInterest = 4;
 
         return 1;
     }
@@ -269,7 +270,7 @@ public class MapGenerator : MonoBehaviour
         throw new System.Exception("An unexpected CardinalDirection was passed"); // THIS SHOULD NEVER HAPPEN
     }
 
-    private int shortestDistanceToOtherRoomPointsAndOuterWalls()
+    private int calculateShortestDistanceToOtherRoomPointsAndOuterWalls()
     {
         int shortestDistance = int.MaxValue;
         List<(int, int)> roomPoints = new List<(int, int)>();
@@ -287,7 +288,7 @@ public class MapGenerator : MonoBehaviour
 
         for (int i = 0; i < roomPoints.Count; i++)
         {
-            for (int j = 1 + 1; j < roomPoints.Count; j++)
+            for (int j = i + 1; j < roomPoints.Count; j++)
             {
                 int distanceBetweenIAndJ = Mathf.Abs(roomPoints[i].Item1 - roomPoints[j].Item1) + Mathf.Abs(roomPoints[i].Item2 - roomPoints[j].Item2);
                 if (distanceBetweenIAndJ < shortestDistance)
@@ -339,7 +340,8 @@ public class MapGenerator : MonoBehaviour
                     numberOfRoomPointsPlaced += 1;
                 }
             }
-        } while (shortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints);
+            Debug.Log("calculateShortestDistanceToOtherRoomPointsAndOuterWalls: " + calculateShortestDistanceToOtherRoomPointsAndOuterWalls());
+        } while (calculateShortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints);
     }
 
     private void GenerateWallsFromRoomPoints()
