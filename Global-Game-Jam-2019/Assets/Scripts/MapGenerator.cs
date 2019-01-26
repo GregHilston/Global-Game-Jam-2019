@@ -10,6 +10,7 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
     public Camera camera;
+    public string seed;
     private System.Random random;
     private const int rows = 25;
     private const int firstNonWallRow = 1; // skipping the 0th row, as its a wall
@@ -39,8 +40,8 @@ public class MapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        const string seed = "potatoes";
-        this.GenerateMap(seed);
+        this.seed = "potatoes";
+        this.GenerateMap();
     }
 
     // Update is called once per frame
@@ -456,10 +457,9 @@ public class MapGenerator : MonoBehaviour
     /// 4: (int) Number of cameras = 
     /// 5: (bool) is day time
     /// </summary>
-    /// <param name="seed">Seed.</param>
-    public void GenerateMap(string seed) 
+    public void GenerateMap() 
     {
-        string md5 = this.CreateMD5(seed);
+        string md5 = this.CreateMD5(this.seed);
 
         int numberOfRooms = this.CalculateNumberOfRooms(md5);
         int numberOfPeopleHome = this.CalculateNumberOfPeopleHome(md5);
