@@ -11,7 +11,9 @@ public class MapGenerator : MonoBehaviour
 {
     public Camera camera;
     private const int columns = 25;
+    private const int lastColumn = columns - 1; // -1 to convert from 0 based to 1 based
     private const int rows = 25;
+    private const int lastRow = rows - 1; // -1 to convert from 0 based to 1 based
     private const int roomArea = columns * rows;
     private const int minRoomSize = 2;
     private const int maxRoomSize = 6;
@@ -152,9 +154,23 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void EntireBoardAsFloor()
+    private void AddOuterWalls()
     {
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                const int firstRowOrColumn = 0;
+               if(row == firstRowOrColumn || row == lastRow)
+                {
+                    board[row][column] = TileType.Wall;
+                } else if (column == firstRowOrColumn || column == lastColumn)
+                {
+                    board[row][column] = TileType.Wall;
+                }
 
+            }
+        }
     }
 
     /// <summary>
@@ -171,9 +187,6 @@ public class MapGenerator : MonoBehaviour
     /// <param name="seed">Seed.</param>
     public void GenerateMap(string seed) 
     {
-        Debug.Log("seed: " + seed);
-        Debug.Log("md5: " + this.CreateMD5(seed));
-
         int numberOfRooms = this.CalculateNumberOfRooms(seed);
         int numberOfPeopleHome = this.CalculateNumberOfPeopleHome(seed);
         int numberOfPetsHome = this.CalculateNumberOfPetsHome(seed);
@@ -181,8 +194,7 @@ public class MapGenerator : MonoBehaviour
         int numberOfCameras = this.CalculateNumberOfCameras(seed);
 
         this.InitializeBoard();
-
-        Debug.Log("board: " + this.board);
+        this.AddOuterWalls();
     }
 }
 
