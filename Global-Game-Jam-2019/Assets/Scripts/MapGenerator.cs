@@ -9,6 +9,7 @@ using UnityEngine;
 /// </summary>
 public class MapGenerator : MonoBehaviour
 {
+    public Camera camera;
     private const int columns = 25;
     private const int rows = 25;
     private const int roomArea = columns * rows;
@@ -37,7 +38,7 @@ public class MapGenerator : MonoBehaviour
     private void OnDrawGizmos()
     {
         // 2d has a zero z plane
-        Debug.Log("OnDrawGizmos()");
+        Vector3 startingPositionTopLeft = this.camera.ScreenToWorldPoint(new Vector3(0, this.camera.pixelHeight, this.camera.nearClipPlane));
 
         Color[] tileColors = { Color.black, Color.gray, Color.white };
 
@@ -70,7 +71,7 @@ public class MapGenerator : MonoBehaviour
                 const float baseYOffset = sharedUnit;
                 const float size = 0.8f;
 
-               Gizmos.DrawCube(new Vector3(baseXOffset * row, baseYOffset * column, 0.0f), new Vector3(size, size, size));
+               Gizmos.DrawCube(new Vector3(startingPositionTopLeft.x + baseXOffset * row, startingPositionTopLeft.y + baseYOffset * -column, 0.0f), new Vector3(size, size, size));
             }
         }
 
