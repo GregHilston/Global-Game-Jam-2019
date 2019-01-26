@@ -27,7 +27,13 @@ public class MapGenerator : MonoBehaviour
     // The type of tile that will be laid in a specific position.
     public enum TileType
     {
-        Wall, Floor, Door, RoomPoint,
+        Wall, Floor, ExternalDoor, RoomPoint, InteralDoor, DoorWalkWay, GrabbableObject, SecurityCamera
+        // RoomPoint will act as a spawn location for enemies
+    }
+
+    private enum CardinalDirection
+    {
+        North, South, East, West,
     }
 
     // Start is called before the first frame update
@@ -48,7 +54,7 @@ public class MapGenerator : MonoBehaviour
         // 2d has a zero z plane
         Vector3 startingPositionTopLeft = this.camera.ScreenToWorldPoint(new Vector3(0, this.camera.pixelHeight, this.camera.nearClipPlane));
 
-        Color[] tileColors = { Color.black, Color.gray, Color.white, Color.cyan };
+        Color[] tileColors = { Color.black, Color.gray, Color.white, Color.cyan, new Color(255, 99, 71), Color.yellow };
 
         for (int row = 0; row < this.board.Length; row++)
         {
@@ -67,7 +73,7 @@ public class MapGenerator : MonoBehaviour
                             Gizmos.color = tileColors[1];
                             break;
                         }
-                    case TileType.Door:
+                    case TileType.ExternalDoor:
                         {
                             Gizmos.color = tileColors[2];
                             break;
@@ -186,7 +192,7 @@ public class MapGenerator : MonoBehaviour
             for (int column = 0; column < this.board[row].Length; column++)
             {
                 const int firstRowOrColumn = 0;
-               if(row == firstRowOrColumn || row == lastRow)
+               if (row == firstRowOrColumn || row == lastRow)
                 {
                     board[row][column] = TileType.Wall;
                 } else if (column == firstRowOrColumn || column == lastColumn)
@@ -207,7 +213,7 @@ public class MapGenerator : MonoBehaviour
     {
         int randomInt = this.random.Next(0, 1);
 
-        if(randomInt == 0)
+        if (randomInt == 0)
         {
             return 0;
         }
@@ -235,21 +241,87 @@ public class MapGenerator : MonoBehaviour
         int externalRow = this.GenerateRandomOuterRow();
         int externalColumn = this.GenerateRandomOuterColumn();
 
-        board[externalRow][externalColumn] = TileType.Door;
+        board[externalRow][externalColumn] = TileType.ExternalDoor;
     }
 
-    private void GenerateRoomPoints(int numberOfRooms) {
+    private (int, int) GenerateStep(int row, int column, CardinalDirection cardinalDirection)
+    {
+        switch (cardinalDirection)
+        {
+            case CardinalDirection.North:
+                {
+                    return (row - 1, column);
+                }
+            case CardinalDirection.East:
+                {
+                    return (row, column - 1);
+                }
+            case CardinalDirection.South:
+                {
+                    return(row + 1, column);
+                }
+            case CardinalDirection.West:
+                {
+                    return(row, column + 1);
+                }
+        }
+
+        throw new System.Exception("An unexpected CardinalDirection was passed"); // THIS SHOULD NEVER HAPPEN
+    }
+
+    private void shortestDistanceToOtherRoomPointsAndOuterWalls(int row, int column)
+    {
+        const int shortestDistance = int.MaxValue;
+        CardinalDirection[] cardinalDirections = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West};
+
+        foreach (CardinalDirection cardinalDirection in cardinalDirections)
+        {
+            int cellsWalked = 0;
+            int currentRow = row;
+            int currentColumn = column;
+
+            do {
+                (currentRow, currentColumn) = GenerateStep(currentRow, currentColumn, cardinalDirection);
+
+                if (board[currentRow][currentColumn] != TileType.Wall || )
+            } while ()
+        }
+    }
+
+    private void GenerateRoomPoints(int numberOfRoomPoints = 3)
+    {
+        const int minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints = 4;
+
+
         int numberOfRoomPointsPlaced = 0;
 
-        while (numberOfRoomPointsPlaced != numberOfRooms) {
+        while (numberOfRoomPointsPlaced != numberOfRoomPoints)
+        {
             int potentialRow = this.random.Next(firstNonWallRow, lastNonWallRow);
             int potentialColumn = this.random.Next(firstNonWallColumn, lastNonWallColumn);
 
-            if(board[potentialRow][potentialColumn] == TileType.Floor)
+            if (board[potentialRow][potentialColumn] == TileType.Floor)
+
             {
                 // we have found a room point!
                 board[potentialRow][potentialColumn] = TileType.RoomPoint;
                 numberOfRoomPointsPlaced += 1;
+            }
+        }
+    }
+
+    private void GenerateRooms(int numberOfRooms) {
+        this.GenerateRoomPoints();
+
+        // grow two shortest walls
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                if (this.board[row][column] == TileType.RoomPoint) {
+                    // CardinalDirection shortestTwoDirectionsToWall =
+                    // TODO
+                }
             }
         }
     }
@@ -284,7 +356,7 @@ public class MapGenerator : MonoBehaviour
         this.InitializeBoard();
         this.AddOuterWalls();
         this.AddExternalDoor();
-        this.GenerateRoomPoints(numberOfRooms);
+        this.GenerateRooms(numberOfRooms);
     }
 }
 
