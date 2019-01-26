@@ -477,9 +477,21 @@ public class MapGenerator : MonoBehaviour
         this.ReplaceAllRoomPointsWithWalls();
     }
 
+    private void KnockDownSkinnyRooms()
+    {
+        int minimumNumberOfHeightOrWidth = 3;
+
+
+    }
+
+    private int CountRooms()
+    {
+        int roomCount = 0;
+    }
+
     private void KnockDownWalls()
     {
-
+        this.KnockDownSkinnyRooms();
     }
 
     /// <summary>
