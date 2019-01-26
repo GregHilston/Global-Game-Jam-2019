@@ -3,13 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Map generator.
+/// Referenced https://unity3d.com/learn/tutorials/topics/scripting/basic-2d-dungeon-generation
+/// </summary>
 public class MapGenerator : MonoBehaviour
 {
-    private const int roomWidth = 25;
-    private const int roomLength = 25;
-    private const int roomArea = roomWidth * roomLength;
+    private const int columns = 25;
+    private const int rows = 25;
+    private const int roomArea = columns * rows;
     private const int minRoomSize = 2;
     private const int maxRoomSize = 6;
+    private TileType[][] board;
+
+    // The type of tile that will be laid in a specific position.
+    public enum TileType
+    {
+        Wall, Floor, Door,
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -82,6 +93,27 @@ public class MapGenerator : MonoBehaviour
         return 1;
     }
 
+    private void InitializeBoard()
+    {
+        this.board = new TileType[rows][];
+
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            this.board[row] = new TileType[columns];
+
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                this.board[row][column] = TileType.Floor;
+                
+            }
+        }
+    }
+
+    private void EntireBoardAsFloor()
+    {
+
+    }
+
     /// <summary>
     /// Generates the a map from a given seed.
     /// We leverage hashing the seed to MD5, leveraging the 32 character string.
@@ -104,6 +136,10 @@ public class MapGenerator : MonoBehaviour
         int numberOfPetsHome = this.CalculateNumberOfPetsHome(seed);
         int numberOfObjectsToMove = this.CalculateNumberOfObjectsToMove(seed);
         int numberOfCameras = this.CalculateNumberOfCameras(seed);
+
+        this.InitializeBoard();
+
+        Debug.Log("board: " + this.board);
     }
 }
 
