@@ -25,12 +25,54 @@ public class MapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        this.GenerateMap("ANSADOKJASDJASDLJASDOJASODJASODIJASODIJOASIDJASOIJASODIJ");
+        this.GenerateMap("potato");
     }
 
     // Update is called once per frame
     void Update()
     {
+
+    }
+
+    private void OnDrawGizmos()
+    {
+        // 2d has a zero z plane
+        Debug.Log("OnDrawGizmos()");
+
+        Color[] tileColors = { Color.black, Color.gray, Color.white };
+
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                switch (this.board[row][column])
+                {
+                    case TileType.Wall:
+                        {
+
+                            Gizmos.color = tileColors[0];
+                            break;
+                        }
+                    case TileType.Floor:
+                        {
+                            Gizmos.color = tileColors[1];
+                            break;
+                        }
+                    case TileType.Door:
+                        {
+                            Gizmos.color = tileColors[2];
+                            break;
+                        }
+                }
+
+                const float sharedUnit = 1.0f;
+                const float baseXOffset = sharedUnit;
+                const float baseYOffset = sharedUnit;
+                const float size = 0.8f;
+
+               Gizmos.DrawCube(new Vector3(baseXOffset * row, baseYOffset * column, 0.0f), new Vector3(size, size, size));
+            }
+        }
 
     }
 
