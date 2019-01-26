@@ -269,45 +269,91 @@ public class MapGenerator : MonoBehaviour
         throw new System.Exception("An unexpected CardinalDirection was passed"); // THIS SHOULD NEVER HAPPEN
     }
 
-    private void shortestDistanceToOtherRoomPointsAndOuterWalls(int row, int column)
+    private int shortestDistanceToOtherRoomPointsAndOuterWalls()
     {
-        const int shortestDistance = int.MaxValue;
+        int shortestDistance = int.MaxValue;
         CardinalDirection[] cardinalDirections = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West};
 
-        foreach (CardinalDirection cardinalDirection in cardinalDirections)
+        for (int row = 0; row < this.board.Length; row++)
         {
-            int cellsWalked = 0;
-            int currentRow = row;
-            int currentColumn = column;
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                if (this.board[row][column] == TileType.RoomPoint)
+                {
+                    foreach (CardinalDirection cardinalDirection in cardinalDirections)
+                    {
+                        int cellsWalked = 0;
+                        int currentRow = row;
+                        int currentColumn = column;
+                        bool running = true;
 
-            do {
-                (currentRow, currentColumn) = GenerateStep(currentRow, currentColumn, cardinalDirection);
+                        while (running)
+                        {
+                            (currentRow, currentColumn) = GenerateStep(currentRow, currentColumn, cardinalDirection);
+                            cellsWalked += 1;
 
-                if (board[currentRow][currentColumn] != TileType.Wall || )
-            } while ()
+                            if (board[currentRow][currentColumn] == TileType.Wall || board[currentRow][currentColumn] == TileType.RoomPoint || board[currentRow][currentColumn] == TileType.ExternalDoor)
+                            {
+                                if (cellsWalked < shortestDistance)
+                                {
+                                    shortestDistance = cellsWalked;
+                                }
+                                running = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Debug.Log("shortestDistance: " + shortestDistance);
+
+        return shortestDistance;
+    }
+
+    private void RemoveRoomPoints()
+    {
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                if (board[row][column] == TileType.RoomPoint) {
+                    board[row][column] = TileType.Floor;
+                }
+            }
         }
     }
 
     private void GenerateRoomPoints(int numberOfRoomPoints = 3)
     {
-        const int minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints = 4;
+        const int minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints = 8;
 
-
-        int numberOfRoomPointsPlaced = 0;
-
-        while (numberOfRoomPointsPlaced != numberOfRoomPoints)
+        do
         {
-            int potentialRow = this.random.Next(firstNonWallRow, lastNonWallRow);
-            int potentialColumn = this.random.Next(firstNonWallColumn, lastNonWallColumn);
+            Debug.Log("Had to generate new Room points!");
+            int numberOfRoomPointsPlaced = 0;
 
-            if (board[potentialRow][potentialColumn] == TileType.Floor)
-
+            this.RemoveRoomPoints();
+            while (numberOfRoomPointsPlaced != numberOfRoomPoints)
             {
-                // we have found a room point!
-                board[potentialRow][potentialColumn] = TileType.RoomPoint;
-                numberOfRoomPointsPlaced += 1;
+                int potentialRow = this.random.Next(firstNonWallRow, lastNonWallRow);
+                int potentialColumn = this.random.Next(firstNonWallColumn, lastNonWallColumn);
+
+                if (board[potentialRow][potentialColumn] == TileType.Floor)
+
+                {
+                    // we have found a room point!
+                    board[potentialRow][potentialColumn] = TileType.RoomPoint;
+                    Debug.Log("Placed RoomPoint at (" + potentialRow + ", " + potentialColumn + ")");
+                    numberOfRoomPointsPlaced += 1;
+                }
             }
-        }
+        } while (shortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints);
+    }
+
+    private void GenerateWallsFromRoomPoints()
+    {
+
     }
 
     private void GenerateRooms(int numberOfRooms) {
