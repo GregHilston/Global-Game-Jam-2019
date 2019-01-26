@@ -162,9 +162,6 @@ public class MapGenerator : MonoBehaviour
         const int indexOfInterestStart = 5;
         const int indexOfInterestEnd = 8;
 
-        Debug.Log("input: " + input);
-
-
         string unityRandomSeed = input.Substring(indexOfInterestStart, indexOfInterestEnd);
         int integerRepresentation = int.Parse(unityRandomSeed, System.Globalization.NumberStyles.HexNumber);
 
@@ -298,13 +295,11 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log("shortestDistance: " + shortestDistance);
-
+        
         return shortestDistance;
     }
 
-    private int ClosestRoomPointsByRowOrColumn()
+    private int ClosestRoomPointsByRowOrColumnOrExternalWall()
     {
         int shortestDistance = int.MaxValue;
         List<(int, int)> roomPoints = new List<(int, int)>();
@@ -337,6 +332,32 @@ public class MapGenerator : MonoBehaviour
                 {
                     shortestDistance = columnDistanceBetweenIAndJ;
                 }
+
+                // Rows Walls
+                int distanceToFirstRow = Mathf.Abs(roomPoints[i].Item1 - 0);
+                if (distanceToFirstRow < shortestDistance)
+                {
+                    shortestDistance = distanceToFirstRow;
+                }
+
+                int distanceToLastRow = Mathf.Abs(roomPoints[i].Item1 - lastRow);
+                if (distanceToLastRow < shortestDistance)
+                {
+                    shortestDistance = distanceToLastRow;
+                }
+
+                // Column Walls
+                int distanceToFirstColumn = Mathf.Abs(roomPoints[i].Item2 - 0);
+                if (distanceToFirstColumn < shortestDistance)
+                {
+                    shortestDistance = distanceToFirstColumn;
+                }
+
+                int distanceToLastColumn = Mathf.Abs(roomPoints[i].Item2 - lastColumn);
+                if (distanceToLastColumn < shortestDistance)
+                {
+                    shortestDistance = distanceToLastColumn;
+                }
             }
         }
 
@@ -359,11 +380,10 @@ public class MapGenerator : MonoBehaviour
     private void GenerateRoomPoints(int numberOfRoomPoints = 3)
     {
         const int minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints = 8;
-        const int minimumDistanceInRowOrColumn = 3; // this is two empty spaces between, for a total of three indexes away
+        const int minimumDistanceInRowOrColumn = 4; // this is two empty spaces between, for a total of three indexes away
 
         do
         {
-            Debug.Log("Had to generate new Room points!");
             int numberOfRoomPointsPlaced = 0;
 
             this.RemoveRoomPoints();
@@ -377,12 +397,10 @@ public class MapGenerator : MonoBehaviour
                 {
                     // we have found a room point!
                     board[potentialRow][potentialColumn] = TileType.RoomPoint;
-                    Debug.Log("Placed RoomPoint at (" + potentialRow + ", " + potentialColumn + ")");
                     numberOfRoomPointsPlaced += 1;
                 }
             }
-            Debug.Log("calculateShortestDistanceToOtherRoomPointsAndOuterWalls: " + calculateShortestDistanceToOtherRoomPointsAndOuterWalls());
-        } while (calculateShortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints || ClosestRoomPointsByRowOrColumn() < minimumDistanceInRowOrColumn);
+        } while (calculateShortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints || ClosestRoomPointsByRowOrColumnOrExternalWall() < minimumDistanceInRowOrColumn);
     }
 
     private bool IsCoordinateExternal(int row, int column)
@@ -424,9 +442,7 @@ public class MapGenerator : MonoBehaviour
                 do
                 {
                     (int newRow, int newColumn) = GenerateStep(currentRow, currentColumn, cardinalDirection);
-
-                    Debug.Log(board[newRow][newColumn]);
-
+                    
                     if (IsCoordinateExternal(newRow, newColumn))
                     {
                         running = false;
@@ -467,9 +483,7 @@ public class MapGenerator : MonoBehaviour
         int numberOfObjectsToMove = this.CalculateNumberOfObjectsToMove(md5);
         int numberOfCameras = this.CalculateNumberOfCameras(md5);
         int unityRandomSeed = this.CalculateUnityRandomSeed(md5);
-
-        Debug.Log("unityRandomSeed: " + unityRandomSeed);
-
+        
         this.random =  new System.Random(unityRandomSeed);
 
         this.InitializeBoard();
