@@ -487,6 +487,10 @@ public class MapGenerator : MonoBehaviour
     private int CountRooms()
     {
         int roomCount = 0;
+
+        // TODO
+
+        return roomCount;
     }
 
     private void KnockDownWalls()
