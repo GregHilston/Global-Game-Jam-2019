@@ -344,25 +344,65 @@ public class MapGenerator : MonoBehaviour
         } while (calculateShortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints);
     }
 
-    private void GenerateWallsFromRoomPoints()
+    private bool IsCoordinateExternal(int row, int column)
     {
-
+        if(board[row][column] == TileType.Wall || board[row][column] == TileType.ExternalDoor)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    private void GenerateRooms(int numberOfRooms) {
-        this.GenerateRoomPoints();
+    private void GenerateWallsFromRoomPoints()
+    {
+        List<(int, int)> roomPoints = new List<(int, int)>();
 
-        // grow two shortest walls
         for (int row = 0; row < this.board.Length; row++)
         {
             for (int column = 0; column < this.board[row].Length; column++)
             {
-                if (this.board[row][column] == TileType.RoomPoint) {
-                    // CardinalDirection shortestTwoDirectionsToWall =
-                    // TODO
+                if (board[row][column] == TileType.RoomPoint)
+                {
+                    roomPoints.Add((row, column));
                 }
             }
         }
+
+        CardinalDirection[] cardinalDirections = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West };
+
+        foreach ((int, int) roomPoint in roomPoints) { 
+            foreach (CardinalDirection cardinalDirection in cardinalDirections)
+            {
+                bool running = true;
+                int currentRow = roomPoint.Item1;
+                int currentColumn = roomPoint.Item2;
+
+                do
+                {
+                    (int newRow, int newColumn) = GenerateStep(currentRow, currentColumn, cardinalDirection);
+
+                    Debug.Log(board[newRow][newColumn]);
+
+                    if (IsCoordinateExternal(newRow, newColumn))
+                    {
+                        running = false;
+                    }
+                    else if (board[newRow][newColumn] == TileType.Floor || board[newRow][newColumn] == TileType.RoomPoint) {
+                        board[newRow][newColumn] = TileType.Wall;
+                        currentRow = newRow;
+                        currentColumn = newColumn;
+                    }
+                } while (running);
+            }
+        }
+    }
+
+    private void GenerateRooms(int numberOfRooms) {
+        this.GenerateRoomPoints();
+        this.GenerateWallsFromRoomPoints();
     }
 
     /// <summary>
