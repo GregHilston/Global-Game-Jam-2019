@@ -174,6 +174,48 @@ public class MapGenerator : MonoBehaviour
     }
 
     /// <summary>
+    /// Generates the random outer row. Always using the first or the last row
+    /// for simplicity and so we can use any column we want.
+    /// </summary>
+    /// <returns>The random outer row.</returns>
+    private int GenerateRandomOuterRow()
+    {
+        System.Random rnd = new System.Random();
+        int randomInt = rnd.Next(0, 1);
+
+        if(randomInt == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return lastRow;
+        }
+    }
+
+    /// <summary>
+    /// Generates the random outer column. To be used in combination with a 
+    /// first row or last row to ensure we're external.
+    /// </summary>
+    /// <returns>The random outer column.</returns>
+    private int GenerateRandomOuterColumn()
+    {
+        int secondRow = 1; // ensuring we can't randomize to 0 and be in the corner
+        int secondToLastColumn = lastColumn - 1;
+        System.Random rnd = new System.Random();
+
+        return rnd.Next(secondRow, secondToLastColumn);
+    }
+
+    private void AddExternalDoor()
+    {
+        int externalRow = this.GenerateRandomOuterRow();
+        int externalColumn = this.GenerateRandomOuterColumn();
+
+        board[externalRow][externalColumn] = TileType.Door;
+    }
+
+    /// <summary>
     /// Generates the a map from a given seed.
     /// We leverage hashing the seed to MD5, leveraging the 32 character string.
     /// We'll interpret each character as hex and each index as follows:
@@ -195,6 +237,7 @@ public class MapGenerator : MonoBehaviour
 
         this.InitializeBoard();
         this.AddOuterWalls();
+        this.AddExternalDoor();
     }
 }
 
