@@ -11,10 +11,14 @@ public class MapGenerator : MonoBehaviour
 {
     public Camera camera;
     private System.Random random;
-    private const int columns = 25;
-    private const int lastColumn = columns - 1; // -1 to convert from 0 based to 1 based
     private const int rows = 25;
+    private const int firstNonWallRow = 1; // skipping the 0th row, as its a wall
+    private const int lastNonWallRow = rows - 2; // -2, 1 for o based and 1 for skipping last row, as its a wall
     private const int lastRow = rows - 1; // -1 to convert from 0 based to 1 based
+    private const int firstNonWallColumn = 1; // skipping hthe 0th column, as its a wall
+    private const int columns = 25;
+    private const int lastNonWallColumn = columns - 2; // -2, 1 for o based and 1 for skipping last column, as its a wall
+    private const int lastColumn = columns - 1; // -1 to convert from 0 based to 1 based
     private const int roomArea = columns * rows;
     private const int minRoomSize = 2;
     private const int maxRoomSize = 6;
@@ -229,6 +233,22 @@ public class MapGenerator : MonoBehaviour
         board[externalRow][externalColumn] = TileType.Door;
     }
 
+    private void GenerateRoomPoints(int numberOfRooms) {
+        int numberOfRoomPointsPlaced = 0;
+
+        while (numberOfRoomPointsPlaced != numberOfRooms) {
+            int potentialRow = this.random.Next(firstNonWallRow, lastNonWallRow);
+            int potentialColumn = this.random.Next(firstNonWallColumn, lastNonWallColumn);
+
+            if(board[potentialRow][potentialColumn] == TileType.Floor)
+            {
+                // we have found a room point!
+                board[potentialRow][potentialColumn] = TileType.Door;
+                numberOfRoomPointsPlaced += 1;
+            }
+        }
+    }
+
     /// <summary>
     /// Generates the a map from a given seed.
     /// We leverage hashing the seed to MD5, leveraging the 32 character string.
@@ -259,6 +279,7 @@ public class MapGenerator : MonoBehaviour
         this.InitializeBoard();
         this.AddOuterWalls();
         this.AddExternalDoor();
+        this.GenerateRoomPoints(numberOfRooms);
     }
 }
 
