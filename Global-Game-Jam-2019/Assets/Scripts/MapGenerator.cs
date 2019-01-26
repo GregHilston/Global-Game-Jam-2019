@@ -27,7 +27,7 @@ public class MapGenerator : MonoBehaviour
     // The type of tile that will be laid in a specific position.
     public enum TileType
     {
-        Wall, Floor, Door,
+        Wall, Floor, Door, RoomPoint,
     }
 
     // Start is called before the first frame update
@@ -48,7 +48,7 @@ public class MapGenerator : MonoBehaviour
         // 2d has a zero z plane
         Vector3 startingPositionTopLeft = this.camera.ScreenToWorldPoint(new Vector3(0, this.camera.pixelHeight, this.camera.nearClipPlane));
 
-        Color[] tileColors = { Color.black, Color.gray, Color.white };
+        Color[] tileColors = { Color.black, Color.gray, Color.white, Color.cyan };
 
         for (int row = 0; row < this.board.Length; row++)
         {
@@ -70,6 +70,11 @@ public class MapGenerator : MonoBehaviour
                     case TileType.Door:
                         {
                             Gizmos.color = tileColors[2];
+                            break;
+                        }
+                    case TileType.RoomPoint:
+                        {
+                            Gizmos.color = tileColors[3];
                             break;
                         }
                 }
@@ -243,7 +248,7 @@ public class MapGenerator : MonoBehaviour
             if(board[potentialRow][potentialColumn] == TileType.Floor)
             {
                 // we have found a room point!
-                board[potentialRow][potentialColumn] = TileType.Door;
+                board[potentialRow][potentialColumn] = TileType.RoomPoint;
                 numberOfRoomPointsPlaced += 1;
             }
         }
