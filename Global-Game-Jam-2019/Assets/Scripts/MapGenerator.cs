@@ -457,9 +457,29 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    private void ReplaceAllRoomPointsWithWalls()
+    {
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                if (board[row][column] == TileType.RoomPoint)
+                {
+                    board[row][column] = TileType.Wall;
+                }
+            }
+        }
+    }
+
     private void GenerateRooms(int numberOfRooms) {
         this.GenerateRoomPoints();
         this.GenerateWallsFromRoomPoints();
+        this.ReplaceAllRoomPointsWithWalls();
+    }
+
+    private void KnockDownWalls()
+    {
+
     }
 
     /// <summary>
@@ -490,6 +510,7 @@ public class MapGenerator : MonoBehaviour
         this.AddOuterWalls();
         this.AddExternalDoor();
         this.GenerateRooms(numberOfRooms);
+        this.KnockDownWalls();
     }
 }
 
