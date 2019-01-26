@@ -303,6 +303,45 @@ public class MapGenerator : MonoBehaviour
         return shortestDistance;
     }
 
+    private int ClosestRoomPointsByRowOrColumn()
+    {
+        int shortestDistance = int.MaxValue;
+        List<(int, int)> roomPoints = new List<(int, int)>();
+
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                if (board[row][column] == TileType.RoomPoint)
+                {
+                    roomPoints.Add((row, column));
+                }
+            }
+        }
+
+        for (int i = 0; i < roomPoints.Count; i++)
+        {
+            for (int j = i + 1; j < roomPoints.Count; j++)
+            {
+                int rowDistanceBetweenIAndJ = Mathf.Abs(roomPoints[i].Item1 - roomPoints[j].Item1);
+
+                if (rowDistanceBetweenIAndJ < shortestDistance)
+                {
+                    shortestDistance = rowDistanceBetweenIAndJ;
+                }
+
+                int columnDistanceBetweenIAndJ = Mathf.Abs(roomPoints[i].Item2 - roomPoints[j].Item2);
+
+                if (columnDistanceBetweenIAndJ < shortestDistance)
+                {
+                    shortestDistance = columnDistanceBetweenIAndJ;
+                }
+            }
+        }
+
+        return shortestDistance;
+    }
+
     private void RemoveRoomPoints()
     {
         for (int row = 0; row < this.board.Length; row++)
@@ -319,6 +358,7 @@ public class MapGenerator : MonoBehaviour
     private void GenerateRoomPoints(int numberOfRoomPoints = 3)
     {
         const int minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints = 8;
+        const int minimumDistanceInRowOrColumn = 3; // this is two empty spaces between, for a total of three indexes away
 
         do
         {
@@ -341,7 +381,7 @@ public class MapGenerator : MonoBehaviour
                 }
             }
             Debug.Log("calculateShortestDistanceToOtherRoomPointsAndOuterWalls: " + calculateShortestDistanceToOtherRoomPointsAndOuterWalls());
-        } while (calculateShortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints);
+        } while (calculateShortestDistanceToOtherRoomPointsAndOuterWalls() < minimumDistanceFromRoomPointToOuterWallsAndOtherRoomPoints || ClosestRoomPointsByRowOrColumn() < minimumDistanceInRowOrColumn);
     }
 
     private bool IsCoordinateExternal(int row, int column)
