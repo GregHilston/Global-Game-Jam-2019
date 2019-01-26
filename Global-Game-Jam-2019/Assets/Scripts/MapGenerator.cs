@@ -272,36 +272,27 @@ public class MapGenerator : MonoBehaviour
     private int shortestDistanceToOtherRoomPointsAndOuterWalls()
     {
         int shortestDistance = int.MaxValue;
-        CardinalDirection[] cardinalDirections = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West};
+        List<(int, int)> roomPoints = new List<(int, int)>();
 
         for (int row = 0; row < this.board.Length; row++)
         {
             for (int column = 0; column < this.board[row].Length; column++)
             {
-                if (this.board[row][column] == TileType.RoomPoint)
+                if (board[row][column] == TileType.RoomPoint)
                 {
-                    foreach (CardinalDirection cardinalDirection in cardinalDirections)
-                    {
-                        int cellsWalked = 0;
-                        int currentRow = row;
-                        int currentColumn = column;
-                        bool running = true;
+                    roomPoints.Add((row, column));
+                }
+            }
+        }
 
-                        while (running)
-                        {
-                            (currentRow, currentColumn) = GenerateStep(currentRow, currentColumn, cardinalDirection);
-                            cellsWalked += 1;
-
-                            if (board[currentRow][currentColumn] == TileType.Wall || board[currentRow][currentColumn] == TileType.RoomPoint || board[currentRow][currentColumn] == TileType.ExternalDoor)
-                            {
-                                if (cellsWalked < shortestDistance)
-                                {
-                                    shortestDistance = cellsWalked;
-                                }
-                                running = false;
-                            }
-                        }
-                    }
+        for (int i = 0; i < roomPoints.Count; i++)
+        {
+            for (int j = 1 + 1; j < roomPoints.Count; j++)
+            {
+                int distanceBetweenIAndJ = Mathf.Abs(roomPoints[i].Item1 - roomPoints[j].Item1) + Mathf.Abs(roomPoints[i].Item2 - roomPoints[j].Item2);
+                if (distanceBetweenIAndJ < shortestDistance)
+                {
+                    shortestDistance = distanceBetweenIAndJ;
                 }
             }
         }
