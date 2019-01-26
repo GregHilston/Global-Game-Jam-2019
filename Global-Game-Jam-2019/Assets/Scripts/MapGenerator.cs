@@ -10,6 +10,7 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
     public Camera camera;
+    private System.Random random;
     private const int columns = 25;
     private const int lastColumn = columns - 1; // -1 to convert from 0 based to 1 based
     private const int rows = 25;
@@ -28,7 +29,8 @@ public class MapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        this.GenerateMap("potato");
+        const string seed = "potatoes";
+        this.GenerateMap(seed);
     }
 
     // Update is called once per frame
@@ -138,6 +140,20 @@ public class MapGenerator : MonoBehaviour
         return 1;
     }
 
+    private int CalculateUnityRandomSeed(string input)
+    {
+        const int indexOfInterestStart = 5;
+        const int indexOfInterestEnd = 8;
+
+        Debug.Log("input: " + input);
+
+
+        string unityRandomSeed = input.Substring(indexOfInterestStart, indexOfInterestEnd);
+        int integerRepresentation = int.Parse(unityRandomSeed, System.Globalization.NumberStyles.HexNumber);
+
+        return integerRepresentation;
+    }
+
     private void InitializeBoard()
     {
         this.board = new TileType[rows][];
@@ -180,8 +196,7 @@ public class MapGenerator : MonoBehaviour
     /// <returns>The random outer row.</returns>
     private int GenerateRandomOuterRow()
     {
-        System.Random rnd = new System.Random();
-        int randomInt = rnd.Next(0, 1);
+        int randomInt = this.random.Next(0, 1);
 
         if(randomInt == 0)
         {
@@ -202,9 +217,8 @@ public class MapGenerator : MonoBehaviour
     {
         int secondRow = 1; // ensuring we can't randomize to 0 and be in the corner
         int secondToLastColumn = lastColumn - 1;
-        System.Random rnd = new System.Random();
 
-        return rnd.Next(secondRow, secondToLastColumn);
+        return this.random.Next(secondRow, secondToLastColumn);
     }
 
     private void AddExternalDoor()
@@ -229,11 +243,18 @@ public class MapGenerator : MonoBehaviour
     /// <param name="seed">Seed.</param>
     public void GenerateMap(string seed) 
     {
-        int numberOfRooms = this.CalculateNumberOfRooms(seed);
-        int numberOfPeopleHome = this.CalculateNumberOfPeopleHome(seed);
-        int numberOfPetsHome = this.CalculateNumberOfPetsHome(seed);
-        int numberOfObjectsToMove = this.CalculateNumberOfObjectsToMove(seed);
-        int numberOfCameras = this.CalculateNumberOfCameras(seed);
+        string md5 = this.CreateMD5(seed);
+
+        int numberOfRooms = this.CalculateNumberOfRooms(md5);
+        int numberOfPeopleHome = this.CalculateNumberOfPeopleHome(md5);
+        int numberOfPetsHome = this.CalculateNumberOfPetsHome(md5);
+        int numberOfObjectsToMove = this.CalculateNumberOfObjectsToMove(md5);
+        int numberOfCameras = this.CalculateNumberOfCameras(md5);
+        int unityRandomSeed = this.CalculateUnityRandomSeed(md5);
+
+        Debug.Log("unityRandomSeed: " + unityRandomSeed);
+
+        this.random =  new System.Random(unityRandomSeed);
 
         this.InitializeBoard();
         this.AddOuterWalls();
