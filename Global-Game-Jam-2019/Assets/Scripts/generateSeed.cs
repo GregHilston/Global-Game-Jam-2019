@@ -68,7 +68,6 @@ public class generateSeed : MonoBehaviour
     void CreateClick()
     {
         seed = mainInputField.text;
-        
     }
 
     void PlayOnClick()
