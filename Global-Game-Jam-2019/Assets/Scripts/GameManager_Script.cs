@@ -36,7 +36,9 @@ public class GameManager_Script : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		CharGrabJoint.enabled = false;
+        AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.MainTheme, true);
+
+        CharGrabJoint.enabled = false;
 		isGrabbing = false;
 		isWalking = false;
 		collArr = new Collider2D[1];
@@ -165,6 +167,10 @@ public class GameManager_Script : MonoBehaviour
     void Update()
     {
 //#if UNITY_EDITOR
+
+        if (Input.GetKey(KeyCode.Escape)) {
+            Application.Quit();
+        }
 
 		if (Input.GetKey(KeyCode.RightArrow))
 		{

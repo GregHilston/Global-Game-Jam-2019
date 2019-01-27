@@ -46,7 +46,7 @@ public class AudioManager : MonoBehaviour
         {
             case AudioFile.MainTheme:
                 {
-                    return "Main Theme";
+                    return "Main_Game_MusicRedux";
                 }
             case AudioFile.DoorOpening:
                 {
@@ -99,7 +99,7 @@ public class AudioManager : MonoBehaviour
         this.currentlyPlaying.Remove(audioFile);
     }
 
-    public void PlayAudioFile(AudioFile audioFile)
+    public void PlayAudioFile(AudioFile audioFile, bool loop = false)
     {
         if (!currentlyPlaying.ContainsKey(audioFile)) {
             AudioSource audioSource = gameObject.AddComponent<AudioSource>();
@@ -110,6 +110,11 @@ public class AudioManager : MonoBehaviour
             AudioClip clip = Resources.Load<AudioClip>(audioFilePath);
 
             audioSource.clip = clip;
+
+            if (loop)
+            {
+                audioSource.loop = true;
+            }
 
             audioSource.PlayOneShot(clip);
 
