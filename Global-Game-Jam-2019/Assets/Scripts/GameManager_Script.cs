@@ -18,6 +18,7 @@ public class GameManager_Script : MonoBehaviour
 
 	bool isGrabbing;
 	bool isWalking;
+    bool isKicking;
 	Collider2D[] collArr;
 	ContactFilter2D grabFilter;
 
@@ -68,6 +69,17 @@ public class GameManager_Script : MonoBehaviour
         else
         {
             AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Scraping);
+        }
+
+        if (isKicking)
+        {
+            Debug.Log("kick!");
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Kick);
+            isKicking = false;
+        }
+        else
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Kick);
         }
     }
 
@@ -136,10 +148,11 @@ public class GameManager_Script : MonoBehaviour
 
 				CharGrabJoint.enabled = false;
 				isGrabbing = false;
+                isKicking = true;
 
 				TestChar.GetComponent<SpriteRenderer>().sprite = StandingSpr;
 			}
-		}
+        }
 		else
 		{
 			if (TestChar.GetComponent<Rigidbody2D>().velocity.SqrMagnitude() > 0f)
