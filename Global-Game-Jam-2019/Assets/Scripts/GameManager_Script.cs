@@ -110,6 +110,10 @@ public class GameManager_Script : MonoBehaviour
     {
 //#if UNITY_EDITOR
 
+        if (Input.GetKey(KeyCode.Escape)) {
+            Application.Quit();
+        }
+
 		if (Input.GetKey(KeyCode.RightArrow))
 		{
 			TestChar.GetComponent<Rigidbody2D>().velocity += new Vector2(1f, 0f);
