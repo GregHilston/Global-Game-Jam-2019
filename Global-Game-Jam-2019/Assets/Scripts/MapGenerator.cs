@@ -24,7 +24,7 @@ public class MapGenerator : MonoBehaviour
     private const int roomArea = columns * rows;
     private const int minRoomSize = 2;
     private const int maxRoomSize = 6;
-    private TileType[][] board;
+    public TileType[][] board;
 
     // The type of tile that will be laid in a specific position.
     public enum TileType

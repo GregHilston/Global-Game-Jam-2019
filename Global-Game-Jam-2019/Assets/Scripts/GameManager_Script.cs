@@ -11,6 +11,7 @@ public class GameManager_Script : MonoBehaviour
 	public CircleCollider2D TestGrabBox;
 
 	public GameObject WallHitboxPrefab;
+	public GameObject FloorTilePrefab;
 
 	public HUD_Script HUDScr;
 	public MapGenerator MapGenScr;
@@ -52,6 +53,19 @@ public class GameManager_Script : MonoBehaviour
 			else
 			{
 				tmpObj.transform.localScale = new Vector3(Mathf.Abs(cVec.x) + 1f, 1f, 1f);
+			}
+		}
+		for (int i = 0; i < MapGenScr.board.Length; i++)
+		{
+			for (int j = 0; j < MapGenScr.board[0].Length; j++)
+			{
+				if (MapGenScr.board[i][j] == MapGenerator.TileType.Floor ||
+					MapGenScr.board[i][j] == MapGenerator.TileType.InteralDoor)
+				{
+					GameObject tmpObj = Instantiate(FloorTilePrefab, transform);
+					tmpObj.transform.localPosition = new Vector3(i, j, 2f) -
+						new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
+				}
 			}
 		}
     }
