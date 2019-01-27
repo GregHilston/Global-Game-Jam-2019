@@ -1,6 +1,6 @@
 ![Game Screenshot](https://raw.githubusercontent.com/GregHilston/Global-Game-Jam-2019/master/Global-Game-Jam-2019/Assets/Art/Home-is-Where.png)
 
-![Game Screenshot](https://raw.githubusercontent.com/GregHilston/Global-Game-Jam-2019/master/Global-Game-Jam-2019/Assets/Art/in_game.png =250x250)
+![Game Screenshot](https://raw.githubusercontent.com/GregHilston/Global-Game-Jam-2019/master/Global-Game-Jam-2019/Assets/Art/in_game.png  | width=100)
 
 > "Break into homes and establish it as your home"
 
