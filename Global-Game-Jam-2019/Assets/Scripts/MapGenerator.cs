@@ -106,8 +106,11 @@ public class MapGenerator : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-        this.seed = "potatoes";
-		//this.GenerateMap();
+        string inputSeed = PlayerPrefs.GetString("player_seed", "Potatoes");
+        this.seed = inputSeed;
+        Debug.Log(inputSeed);
+
+        //this.GenerateMap();
 
 		//// All the wall stuff
 		//Intersections = new List<(int, int)>();
@@ -226,9 +229,15 @@ public class MapGenerator : MonoBehaviour
 
     private int CalculateNumberOfRooms(string input)
     {
-        // const int indexOfInterest = 0;
+        const int indexOfInterest = 0;
+        string charOfInterest = "" + input[indexOfInterest];
+        int hexCharOfInterest = int.Parse(charOfInterest, System.Globalization.NumberStyles.HexNumber);
 
-        return 6;
+        hexCharOfInterest += 1;
+        int intToReturn = ((hexCharOfInterest * 5)  / 4 );
+        Debug.Log(intToReturn);
+
+        return intToReturn;
     }
 
     private int CalculateNumberOfPeopleHome(string input)
@@ -947,13 +956,77 @@ public class MapGenerator : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Counts the rooms. We'll iterate over all the cells and find the first
+    /// floor. We'll mark this floor with a number and grow outward, up against
+    /// all walls and maybe an external door. We'll do this till every floor 
+    /// is marked.
+    /// 
+    /// Once done, we'll know how many rooms there are. 
+    /// </summary>
+    /// <returns>The rooms.</returns>
     private int CountRooms()
     {
-        int roomCount = 0;
+        List<int> rooms = new List<int>();
+        int currentRoom;
+        Tracker tracker = new Tracker();
+        int[][] roomNumber = new int[rows][];
+        const int notInARoom = -1;
 
-        // TODO
+        for (int i = 0; i < rows; i++)
+        {
+            roomNumber[i] = new int[columns];
+            for (int j = 0; j < columns; j++)
+            {
+                roomNumber[i][j] = notInARoom;
+            }
+        }
 
-        return roomCount;
+
+        for (int row = 0; row < this.board.Length; row++)
+        {
+            for (int column = 0; column < this.board[row].Length; column++)
+            {
+                if (board[row][column] == TileType.Floor && roomNumber[row][column] == notInARoom) {
+                    // We've found a tile in a room
+
+                    (int northRow, int northColumn) = GenerateStep(row, column, CardinalDirection.North);
+                    (int eastRow, int eastColumn) = GenerateStep(row, column, CardinalDirection.East);
+                    (int southRow, int southColumn) = GenerateStep(row, column, CardinalDirection.South);
+                    (int westRow, int westColumn) = GenerateStep(row, column, CardinalDirection.West); 
+
+                    if (roomNumber[northRow][northColumn] != notInARoom)
+                    {
+                        currentRoom = roomNumber[northRow][northColumn];
+                    }
+                    else if (roomNumber[eastRow][eastColumn] != notInARoom)
+                    {
+                        currentRoom = roomNumber[eastRow][eastColumn];
+                    }
+                    else if (roomNumber[southRow][southColumn] != notInARoom)
+                    {
+                        currentRoom = roomNumber[southRow][southColumn];
+                    }
+                    else if (roomNumber[westRow][westColumn] != notInARoom)
+                    {
+                        currentRoom = roomNumber[westRow][westColumn];
+                    }
+                    else
+                    {
+                        currentRoom = tracker.GetInt;
+                    }
+
+                    if (!rooms.Contains(currentRoom))
+                    {
+                        rooms.Add(currentRoom);
+                    }
+
+                    roomNumber[row][column] = currentRoom;
+                }
+            }
+        }
+
+        return rooms.Count;
     }
 
     private void KnockDownWalls()

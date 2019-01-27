@@ -22,10 +22,13 @@ public class GameManager_Script : MonoBehaviour
 
 	bool isGrabbing;
 	bool isWalking;
+    bool isKicking;
 	Collider2D[] collArr;
 	ContactFilter2D grabFilter;
-	
-	// Start is called before the first frame update
+
+    bool playedIsGrabbing = false;
+
+    // Start is called before the first frame update
     void Start()
     {
 		CharGrabJoint.enabled = false;
@@ -70,6 +73,74 @@ public class GameManager_Script : MonoBehaviour
 		}
     }
 
+    private void PlayOrStopAppropriateAudio(float massOfObject)
+    {
+        float heavyMass = 3.0f;
+        float dogMass = 0.0f;
+        float floatSubstraction = 0.5f;
+
+        // STOP IN THE NAME OF MA DUDE
+        if (!isWalking)
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.FootstepsWood);
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Scraping);
+        }
+
+        if (!isGrabbing)
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.LiftingGrunt);
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Scraping);
+        }
+
+        if (!isKicking)
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Kick);
+
+        }
+
+
+        // STARTS 
+
+        if (isWalking && !isGrabbing)
+        {
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
+        }
+
+        if (isGrabbing && massOfObject >= heavyMass)
+        {
+            if (!playedIsGrabbing)
+            {
+                playedIsGrabbing = true;
+                AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.LiftingGrunt);
+            }
+        }
+        else if (isGrabbing && (massOfObject - dogMass) < floatSubstraction)
+        {
+            playedIsGrabbing = true;
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Dog);
+        }
+        else if (isGrabbing && massOfObject < heavyMass)
+        {
+            if (!playedIsGrabbing)
+            {
+                playedIsGrabbing = true;
+                AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.PickupVase);
+            }
+        }
+
+        if (isGrabbing && isWalking && massOfObject > heavyMass)
+        {
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Scraping);
+        }
+
+        if (isKicking)
+        {
+            Debug.Log("kick!");
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Kick);
+            isKicking = false;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -106,8 +177,8 @@ public class GameManager_Script : MonoBehaviour
 			isWalking = false;
 		}
 
-		//if (Input.GetKeyDown(KeyCode.A) && (TestObj.transform.position - TestChar.transform.position).magnitude <= 1.5f)
-		if (Input.GetKeyDown(KeyCode.A) && TestGrabBox.OverlapCollider(grabFilter, collArr) == 1)
+        //if (Input.GetKeyDown(KeyCode.A) && (TestObj.transform.position - TestChar.transform.position).magnitude <= 1.5f)
+        if (Input.GetKeyDown(KeyCode.A) && TestGrabBox.OverlapCollider(grabFilter, collArr) == 1)
 		{
 			CharGrabJoint.enabled = true;
 			CharGrabJoint.connectedBody = collArr[0].GetComponent<Rigidbody2D>();
@@ -135,10 +206,11 @@ public class GameManager_Script : MonoBehaviour
 
 				CharGrabJoint.enabled = false;
 				isGrabbing = false;
+                isKicking = true;
 
 				TestChar.GetComponent<SpriteRenderer>().sprite = StandingSpr;
 			}
-		}
+        }
 		else
 		{
 			if (TestChar.GetComponent<Rigidbody2D>().velocity.SqrMagnitude() > 0f)
@@ -160,6 +232,7 @@ public class GameManager_Script : MonoBehaviour
 			}
 		}
 
+        PlayOrStopAppropriateAudio(CharGrabJoint.connectedBody.mass);
 //#endif
 	}
 }
