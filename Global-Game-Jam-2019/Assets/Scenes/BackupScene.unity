@@ -174,7 +174,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &28256131
@@ -223,9 +223,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be7048d46622204c8ecafd2e8f8b7c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimerText: {fileID: 1687963534}
-  PlayerBar: {fileID: 536498315}
-  EnemyBar: {fileID: 1104294235}
 --- !u!114 &106512051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -615,7 +612,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &500885281
@@ -817,7 +814,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &855432468
@@ -995,7 +992,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 1
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &996728659
@@ -1302,18 +1299,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54e64bea5a3d60b4abed29b730742335, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestChar: {fileID: 954692439}
-  TestObj: {fileID: 855432464}
-  CharGrabJoint: {fileID: 954692441}
-  TestGrabBox: {fileID: 1857279330}
-  HUDScr: {fileID: 106512050}
-  StandingSpr: {fileID: 21300000, guid: 52195210a359ea74c82e75ff56c92b49, type: 3}
-  GrabbingSpr: {fileID: 21300000, guid: f21aca8868f5e0544b39a79d91773fd6, type: 3}
-  WalkingSprs:
-  - {fileID: 21300000, guid: c8815433f6984854f83dfd9b4be77720, type: 3}
-  - {fileID: 21300000, guid: 45b59707f3d23514ca64e56bac0cefae, type: 3}
-  - {fileID: 21300000, guid: 3d698d7ed0577f744a39110c8b0e3018, type: 3}
-  - {fileID: 21300000, guid: 902555ecfe94fee478d717a532eb1b58, type: 3}
 --- !u!4 &1557993319
 Transform:
   m_ObjectHideFlags: 0
