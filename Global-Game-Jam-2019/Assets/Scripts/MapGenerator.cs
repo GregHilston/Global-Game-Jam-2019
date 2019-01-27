@@ -471,9 +471,7 @@ public class MapGenerator : MonoBehaviour
 
         writer.WriteLine("shortestDistance: " + shortestDistance);
         writer.Close();
-
-        DrawAsciiBoard("END OF ClosestRoomPointsByRowOrColumnOrExternalWall");
-
+        
         return shortestDistance;
     }
 
@@ -586,7 +584,6 @@ public class MapGenerator : MonoBehaviour
 
     private void GenerateRooms(int numberOfRooms) {
         this.GenerateRoomPoints();
-        DrawAsciiBoard("GenerateRoomPoints");
         this.GenerateWallsFromRoomPoints();
         this.ReplaceAllRoomPointsWithWalls();
     }
@@ -850,43 +847,13 @@ public class MapGenerator : MonoBehaviour
         return false;
     }
 
-    private void RemoveSingleWall()
-    {
-        Debug.Log("Start RemoveSingleWall CountRooms(): " + CountRooms().ToString());
-
-        FindAllWalls();
-        int smallestWallIndex = -1;
-        int smallestWallLength = int.MaxValue;
-
-        for (int i = 0; i < AllWalls.Count; i++)
-        {
-            if (AllWalls[i].DissolvableWalls.Count < smallestWallLength || !IsExternalWall(i))
-            {
-                smallestWallLength = AllWalls[i].DissolvableWalls.Count;
-                smallestWallIndex = i;
-            }
-        }
-
-        for (int i = 0; i < AllWalls[smallestWallIndex].DissolvableWalls.Count; i++) {
-            board[AllWalls[smallestWallIndex].DissolvableWalls[i].Item1][AllWalls[smallestWallIndex].DissolvableWalls[i].Item2] = TileType.Floor;
-        }
-        AllWalls[smallestWallIndex].DissolvableWalls.Clear();
-        AllWalls.RemoveAt(smallestWallIndex);
-
-        Debug.Log("Finish RemoveSingleWall CountRooms(): " + CountRooms().ToString());
-    }
-
     private void KnockDownWalls(int numberOfDesiredRooms)
     {
         int numberOfRooms = CountRooms();
-        Debug.Log("numberOfDesiredRooms: " + numberOfDesiredRooms.ToString());
-        Debug.Log("Start CountRooms(): " + numberOfRooms.ToString());
         while(numberOfRooms != numberOfDesiredRooms)
         {
-            RemoveSingleWall();
             numberOfRooms = CountRooms();
         }
-        Debug.Log("Finish CountRooms(): " + CountRooms().ToString());
     }
 
     /// <summary>
@@ -914,32 +881,35 @@ public class MapGenerator : MonoBehaviour
         this.random =  new System.Random(unityRandomSeed);
 
         this.InitializeBoard();
-
-        DrawAsciiBoard("InitializeBoard");
-
         this.AddOuterWalls();
-
-        DrawAsciiBoard("AddOuterWalls");
-
         this.AddExternalDoor();
-
-        DrawAsciiBoard("AddExternalDoor");
-
         this.GenerateRooms(numberOfRooms);
-
-        DrawAsciiBoard("GenerateRooms");
-
         FindAllWalls();
-
-        DrawAsciiBoard("FindAllWalls");
-
-        this.KnockDownWalls(numberOfRooms);
-
-        DrawAsciiBoard("KnockDownWalls");
-
-        FindAllWalls();
-
-        DrawAsciiBoard("FindAllWalls");
     }
+
+    #region DEPRECATED FUNCTIONS
+    private void RemoveSingleWall()
+    {
+        FindAllWalls();
+        int smallestWallIndex = -1;
+        int smallestWallLength = int.MaxValue;
+
+        for (int i = 0; i < AllWalls.Count; i++)
+        {
+            if (AllWalls[i].DissolvableWalls.Count < smallestWallLength || !IsExternalWall(i))
+            {
+                smallestWallLength = AllWalls[i].DissolvableWalls.Count;
+                smallestWallIndex = i;
+            }
+        }
+
+        for (int i = 0; i < AllWalls[smallestWallIndex].DissolvableWalls.Count; i++)
+        {
+            board[AllWalls[smallestWallIndex].DissolvableWalls[i].Item1][AllWalls[smallestWallIndex].DissolvableWalls[i].Item2] = TileType.Floor;
+        }
+        AllWalls[smallestWallIndex].DissolvableWalls.Clear();
+        AllWalls.RemoveAt(smallestWallIndex);
+    }
+    #endregion
 }
 
