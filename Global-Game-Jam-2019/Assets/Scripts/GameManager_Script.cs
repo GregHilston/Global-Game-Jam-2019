@@ -319,6 +319,11 @@ public class GameManager_Script : MonoBehaviour
 
 		//Debug.Log("BLUE: " + blueInHouse.ToString() + "; RED: " + redInHouse.ToString());
 
+		//if (Input.GetKeyDown(KeyCode.L))
+		//{
+		//	blueInHouse = 11f;
+		//}
+
 		if (allTmpObjs.Count < 1)
 		{
 			HUDScr.OnControlChange(0f, 0f);
