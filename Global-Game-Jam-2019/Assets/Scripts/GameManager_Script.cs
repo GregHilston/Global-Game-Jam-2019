@@ -13,6 +13,9 @@ public class GameManager_Script : MonoBehaviour
 	public GameObject WallHitboxPrefab;
 	public GameObject FloorTilePrefab;
 
+	public GameObject[] RedObjs;
+	public GameObject[] BlueObjs;
+
 	public HUD_Script HUDScr;
 	public MapGenerator MapGenScr;
 
@@ -26,6 +29,8 @@ public class GameManager_Script : MonoBehaviour
 	Collider2D[] collArr;
 	ContactFilter2D grabFilter;
 
+	Random rand;
+
     bool playedIsGrabbing = false;
 
     // Start is called before the first frame update
@@ -37,6 +42,8 @@ public class GameManager_Script : MonoBehaviour
 		collArr = new Collider2D[1];
 		grabFilter = new ContactFilter2D();
 		grabFilter.SetLayerMask(LayerMask.GetMask("Grabbable"));
+
+		rand = new Random();
 
 		//MapGenScr.GenerateMap();
 
@@ -70,6 +77,19 @@ public class GameManager_Script : MonoBehaviour
 						new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
 				}
 			}
+		}
+
+		for (int i = 0; i < MapGenScr.ObjLocations.Count; i++)
+		{
+			GameObject tmpObj = Instantiate(RedObjs[Random.Range(0,RedObjs.Length)], transform);
+			tmpObj.transform.localPosition =
+				new Vector3(MapGenScr.ObjLocations[i].Item1, MapGenScr.ObjLocations[i].Item2, 1f) -
+				new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
+
+			GameObject tmpObj2 = Instantiate(BlueObjs[Random.Range(0, BlueObjs.Length)], transform);
+			tmpObj2.transform.localPosition =
+				new Vector3(2f * i, -1f, 1f) -
+				new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
 		}
     }
 

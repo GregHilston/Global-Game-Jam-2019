@@ -273,7 +273,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 1
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &234149394
@@ -545,7 +545,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 538890784}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2be7048d46622204c8ecafd2e8f8b7c8, type: 3}
+  m_Script: {fileID: 11500000, guid: c425fb06275484c4784d226ce8fb4d25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TimerText: {fileID: 1713499990}
@@ -694,7 +694,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &881615265
@@ -822,7 +822,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &892751406
@@ -1320,7 +1320,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1992951839}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54e64bea5a3d60b4abed29b730742335, type: 3}
+  m_Script: {fileID: 11500000, guid: d713e72c098884fe8a57d810612d5325, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TestChar: {fileID: 180465233}
@@ -1329,17 +1329,35 @@ MonoBehaviour:
   TestGrabBox: {fileID: 255602114}
   WallHitboxPrefab: {fileID: 119166558702262970, guid: e6f99bb54fdb82e47a2135922143b9d8,
     type: 3}
-  FloorTilePrefab: {fileID: 6606690286905359755, guid: 8d8dd9660d5f3de47b43830de1922980,
+  FloorTilePrefab: {fileID: 6024451617670110819, guid: d14d8cde4e3114919bb060a10bf9df67,
     type: 3}
+  RedObjs:
+  - {fileID: 1343166715398286606, guid: 513f8a8a2841c401fb143e5c9c210a50, type: 3}
+  - {fileID: 5227574161165776780, guid: 0ad092b189bfc4eda8d834365a6a872a, type: 3}
+  - {fileID: 4122906120012462268, guid: bb81148440a9241b795813d4490fe215, type: 3}
+  - {fileID: 2396631361042608802, guid: a565d3b82c601485caff4bc8cfc0d0df, type: 3}
+  - {fileID: 1849495527813456225, guid: 077e371bb358748b2905e5cb4ab616f4, type: 3}
+  - {fileID: 273609178818373669, guid: ad46e29be39564df4a6ff34ba1175fb3, type: 3}
+  - {fileID: 5036556998684981223, guid: 1d96b68c0bb974ce1ba5fbfef9513b7a, type: 3}
+  - {fileID: 4453319471705570902, guid: 74f96368a904748cfb3bbffceb4a42b5, type: 3}
+  BlueObjs:
+  - {fileID: 8210577162957395697, guid: 0f13cedc9351d483294b5c02c13b5ca3, type: 3}
+  - {fileID: 6624996243109620440, guid: 0eac842e579024e578d98facc52ee0e4, type: 3}
+  - {fileID: 4606969278524293283, guid: e744ec7b5dc9d43b9bca6b838dab9605, type: 3}
+  - {fileID: 5417806777356175333, guid: 96036435780e949faa181956eb872561, type: 3}
+  - {fileID: 5370470316388158895, guid: fdaec940bd2ed4415a3fc2f3febd0611, type: 3}
+  - {fileID: 1689528269388291980, guid: d3bcfde0072894732ab30a570f446bb6, type: 3}
+  - {fileID: 6560079975828268881, guid: 879d82c0a369348439c6aefd112be32d, type: 3}
+  - {fileID: 5786054012488500127, guid: ea63f0cf121eb4e6eab35d4705dd3d6b, type: 3}
   HUDScr: {fileID: 538890785}
   MapGenScr: {fileID: 1992951841}
-  StandingSpr: {fileID: 21300000, guid: 52195210a359ea74c82e75ff56c92b49, type: 3}
-  GrabbingSpr: {fileID: 21300000, guid: f21aca8868f5e0544b39a79d91773fd6, type: 3}
+  StandingSpr: {fileID: 21300000, guid: 22e0d73f2e70d49c0a1760b37cb174d6, type: 3}
+  GrabbingSpr: {fileID: 21300000, guid: a8feded45c67d4c62ab82aa5b748e161, type: 3}
   WalkingSprs:
-  - {fileID: 21300000, guid: c8815433f6984854f83dfd9b4be77720, type: 3}
-  - {fileID: 21300000, guid: 45b59707f3d23514ca64e56bac0cefae, type: 3}
-  - {fileID: 21300000, guid: 3d698d7ed0577f744a39110c8b0e3018, type: 3}
-  - {fileID: 21300000, guid: 902555ecfe94fee478d717a532eb1b58, type: 3}
+  - {fileID: 21300000, guid: 1e6d05eea63a5457eaf1c5b8a59c0122, type: 3}
+  - {fileID: 21300000, guid: 0dc277d05ce8b4605bd4fcf58b6c1792, type: 3}
+  - {fileID: 21300000, guid: 72cd830ff22184ace89b76644876e826, type: 3}
+  - {fileID: 21300000, guid: 96e99e09c2d504e5083d0e2487330832, type: 3}
 --- !u!114 &1992951841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1349,7 +1367,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1992951839}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0df6714c262ff8d4b8ea681a5954935e, type: 3}
+  m_Script: {fileID: 11500000, guid: d9b2a358570e843e493b76c19167806d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 998562156}

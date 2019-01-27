@@ -98,6 +98,7 @@ public class MapGenerator : MonoBehaviour
 
 	public List<Wall> AllWalls;
 	public List<Room> AllRooms;
+	public List<(int, int)> ObjLocations;
 
 	bool[][] hasThisSpaceBeenChecked;
 
@@ -254,14 +255,17 @@ public class MapGenerator : MonoBehaviour
         return 1;
     }
 
-    private int CalculateNumberOfObjectsToMove(string input)
-    {
-        // const int indexOfInterest = 3;
+	private int CalculateNumberOfObjectsToMove(string input)
+	{
+		const int indexOfInterest = 3;
+		string charOfInterest = "" + input[indexOfInterest];
+		int hexCharOfInterest = int.Parse(charOfInterest, System.Globalization.NumberStyles.HexNumber);
+		hexCharOfInterest += 1;
+		int numberOfObjectMove = (CalculateNumberOfRooms(input) * 4) / hexCharOfInterest;
+		return numberOfObjectMove;
+	}
 
-        return 3;
-    }
-
-    private int CalculateNumberOfCameras(string input)
+	private int CalculateNumberOfCameras(string input)
     {
         // const int indexOfInterest = 4;
 
@@ -949,6 +953,56 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
+	private void DecideObjLocations()
+	{
+		ObjLocations.Clear();
+
+		List<(int, int)> tmpRoomPos = new List<(int, int)>();
+
+		foreach (Room tmpRoom in AllRooms)
+		{
+			foreach ((int, int) space in tmpRoom.RoomSpaces)
+			{
+				int tmpX;
+				int tmpY;
+
+				List<TileType> tmpTiles = new List<TileType>();
+
+				(tmpX, tmpY) = GenerateStep(space.Item1, space.Item2, CardinalDirection.North);
+				tmpTiles.Add(board[tmpX][tmpY]);
+				(tmpX, tmpY) = GenerateStep(space.Item1, space.Item2, CardinalDirection.East);
+				tmpTiles.Add(board[tmpX][tmpY]);
+				(tmpX, tmpY) = GenerateStep(space.Item1, space.Item2, CardinalDirection.South);
+				tmpTiles.Add(board[tmpX][tmpY]);
+				(tmpX, tmpY) = GenerateStep(space.Item1, space.Item2, CardinalDirection.West);
+				tmpTiles.Add(board[tmpX][tmpY]);
+
+				if (!tmpTiles.Exists(x => x == TileType.Wall || x == TileType.ExternalDoor || x == TileType.InteralDoor))
+				{
+					tmpRoomPos.Add((space.Item1, space.Item2));
+				}
+
+			}
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			int randVal = random.Next(0, tmpRoomPos.Count);
+
+			ObjLocations.Add(tmpRoomPos[randVal]);
+
+			tmpRoomPos.RemoveAt(randVal);
+
+			(int tmpX, int tmpY) = ObjLocations[ObjLocations.Count - 1];
+
+			tmpRoomPos.RemoveAll(x =>
+				x == GenerateStep(tmpX, tmpY, CardinalDirection.North) ||
+				x == GenerateStep(tmpX, tmpY, CardinalDirection.East) ||
+				x == GenerateStep(tmpX, tmpY, CardinalDirection.South) ||
+				x == GenerateStep(tmpX, tmpY, CardinalDirection.West));
+		}
+	}
+
     private void KnockDownSkinnyRooms()
     {
         int minimumNumberOfHeightOrWidth = 3;
@@ -1053,6 +1107,7 @@ public class MapGenerator : MonoBehaviour
 		Intersections = new List<(int, int)>();
 		AllWalls = new List<Wall>();
 		AllRooms = new List<Room>();
+		ObjLocations = new List<(int, int)>();
 		hasThisSpaceBeenChecked = new bool[rows][];
 		for (int i = 0; i < rows; i++)
 		{
@@ -1085,6 +1140,7 @@ public class MapGenerator : MonoBehaviour
 		GenerateDoors();
 		FindAllWalls();
 		FindAllRooms();
+		DecideObjLocations();
     }
 }
 
