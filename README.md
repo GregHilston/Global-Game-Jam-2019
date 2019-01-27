@@ -2,7 +2,7 @@
 
 > "Break into homes and establish it as your home"
 
-This project was completed in a 72 hour session called [Global Game Jam](https://globalgamejam.org/). The 2019 theme was 
+This project was completed in a 48 hour session called [Global Game Jam](https://globalgamejam.org/). The 2019 theme was 
 
 > What does home mean to you?
 
