@@ -34,6 +34,8 @@ public class GameManager_Script : MonoBehaviour
 		grabFilter = new ContactFilter2D();
 		grabFilter.SetLayerMask(LayerMask.GetMask("Grabbable"));
 
+		//MapGenScr.GenerateMap();
+
 		for (int i = 0; i < MapGenScr.AllWalls.Count; i++)
 		{
 			GameObject tmpObj = Instantiate(WallHitboxPrefab, transform);

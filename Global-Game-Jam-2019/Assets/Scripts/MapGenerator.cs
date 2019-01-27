@@ -107,22 +107,23 @@ public class MapGenerator : MonoBehaviour
 	void Start()
     {
         this.seed = "potatoes";
-        //this.GenerateMap();
+		//this.GenerateMap();
 
-		// All the wall stuff
-		Intersections = new List<(int, int)>();
-		AllWalls = new List<Wall>();
-		hasThisSpaceBeenChecked = new bool[rows][];
-		for (int i = 0; i < rows; i++)
-		{
-			hasThisSpaceBeenChecked[i] = new bool[columns];
-			for (int j = 0; j < columns; j++)
-			{
-				hasThisSpaceBeenChecked[i][j] = false;
-			}
-		}
-		Debug.Log("Rows:" + hasThisSpaceBeenChecked.Length.ToString());
-		Debug.Log("Cols:" + hasThisSpaceBeenChecked[0].Length.ToString());
+		//// All the wall stuff
+		//Intersections = new List<(int, int)>();
+		//AllWalls = new List<Wall>();
+		//AllRooms = new List<Room>();
+		//hasThisSpaceBeenChecked = new bool[rows][];
+		//for (int i = 0; i < rows; i++)
+		//{
+		//	hasThisSpaceBeenChecked[i] = new bool[columns];
+		//	for (int j = 0; j < columns; j++)
+		//	{
+		//		hasThisSpaceBeenChecked[i][j] = false;
+		//	}
+		//}
+		//Debug.Log("Rows:" + hasThisSpaceBeenChecked.Length.ToString());
+		//Debug.Log("Cols:" + hasThisSpaceBeenChecked[0].Length.ToString());
 
 		GenerateMap();
 	}
@@ -135,6 +136,8 @@ public class MapGenerator : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
+		return;
+
 		if (board != null && AllRooms != null)
 		{
 			// 2d has a zero z plane
@@ -177,6 +180,11 @@ public class MapGenerator : MonoBehaviour
 						case TileType.RoomPoint:
 							{
 								Gizmos.color = tileColors[3];
+								break;
+							}
+						case TileType.InteralDoor:
+							{
+								Gizmos.color = new Color(1f, 0.8f, 0.3f, 1f);
 								break;
 							}
 					}
@@ -594,7 +602,7 @@ public class MapGenerator : MonoBehaviour
 	/// <summary>
 	/// Determines all the walls connected in the generated map
 	/// </summary>
-	private void FindAllWalls()
+	private void FindAllWalls(bool treatExtDoorAsWall = false)
 	{
 		// The logic behind this method is that every "wall" in the map is sequence
 		// of wall tiles bookended by intersection points.
@@ -604,8 +612,8 @@ public class MapGenerator : MonoBehaviour
 		// a "dissolvable" wall as long as it is not an intersection point.
 
 		// Initializes everything
-		AllWalls = new List<Wall>();
-		Intersections = new List<(int, int)>();
+		AllWalls.Clear();
+		Intersections.Clear();
 		for (int i = 0; i < hasThisSpaceBeenChecked.Length; i++)
 		{
 			for (int j = 0; j < hasThisSpaceBeenChecked[0].Length; j++)
@@ -618,7 +626,7 @@ public class MapGenerator : MonoBehaviour
 		// Queues up the top left wall tile.
 		// The dges are guaranteed to be wall tiles.
 		Queue<(int, int)> tmpIntersections = new Queue<(int, int)>();
-		tmpIntersections.Enqueue((0, 0));
+		//tmpIntersections.Enqueue((0, 0));
 
 		// Tracks which tiles we are on
 		int thisRow = 0;
@@ -634,109 +642,145 @@ public class MapGenerator : MonoBehaviour
 		// Not necessary, since intersection points are the one space that don't count as "checked"
 		// (that's only needed to make sure we don't create two walls with switched starting and
 		// ending points), but just in case...
-		hasThisSpaceBeenChecked[0][0] = true;
+		//hasThisSpaceBeenChecked[0][0] = true;
 
-		// Do this for every intersection you find
-		while (tmpIntersections.Count > 0)
+		while (thisRow != -1)
 		{
-			// Starts off by dequeueing and checking first item in the temporary intersection checker
-			(thisRow, thisCol) = tmpIntersections.Dequeue();
-
-			// Checks every direction from the intersection
-			foreach (CardinalDirection dir in cardinalDirections)
+			tmpIntersections.Enqueue((thisRow, thisCol));
+			
+			// Do this for every intersection you find
+			while (tmpIntersections.Count > 0)
 			{
-				// Creates a temporary wall to start off.
-				// Dissolvable walls will be added as we find them.
-				// Hitting an intersection will bookend that wall and finalize it.
-				Wall tmpWall = new Wall(tmpTracker.GetInt);
+				// Starts off by dequeueing and checking first item in the temporary intersection checker
+				(thisRow, thisCol) = tmpIntersections.Dequeue();
 
-				// Starts off in the direction being checked
-				(int newRow, int newCol) = GenerateStep(thisRow, thisCol, dir);
-
-				// If this tile being checked is inside the bounds of the array,
-				// is either a wall or a door,
-				// and has not been checked yet,
-				// do further checking on it.
-				while (newRow > -1 && newRow < rows && newCol > -1 && newCol < columns &&
-					(board[newRow][newCol] == TileType.Wall || board[newRow][newCol] == TileType.ExternalDoor) &&
-					!hasThisSpaceBeenChecked[newRow][newCol])
+				// Checks every direction from the intersection
+				foreach (CardinalDirection dir in cardinalDirections)
 				{
-					// We can create a unique number at the end by multiplying 1 by prime numbers,
-					// based on what walls border this one being checked.
-					int testVal = 1;
+					// Creates a temporary wall to start off.
+					// Dissolvable walls will be added as we find them.
+					// Hitting an intersection will bookend that wall and finalize it.
+					Wall tmpWall = new Wall(tmpTracker.GetInt);
 
-					// We will overwrite these temporary X and Y values a lot as we check directions
-					int tmpX;
-					int tmpY;
+					// Starts off in the direction being checked
+					(int newRow, int newCol) = GenerateStep(thisRow, thisCol, dir);
 
-					// If the East square does not exist or is a floor, mult by 2
-					(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.East);
-
-					if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
-						board[tmpX][tmpY] == TileType.Floor)
-					{ testVal *= 2; }
-
-					// If the North square does not exist or is a floor, mult by 3
-					(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.North);
-
-					if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
-						board[tmpX][tmpY] == TileType.Floor)
-					{ testVal *= 3; }
-
-					// If the West square does not exist or is a floor, mult by 5
-					(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.West);
-
-					if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
-						board[tmpX][tmpY] == TileType.Floor)
-					{ testVal *= 5; }
-
-					// If the South square does not exist or is a floor, mult by 7
-					(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.South);
-
-					if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
-						board[tmpX][tmpY] == TileType.Floor)
-					{ testVal *= 7; }
-
-					// If the resultant value is 10 or 21, it's a regular wall,
-					// because that means the only walls bordering it are on its
-					// East and West, or North and South, meaning it's not an intersection.
-					if (testVal == 10 || testVal == 21)
+					// If this tile being checked is inside the bounds of the array,
+					// is either a wall or a door,
+					// and has not been checked yet,
+					// do further checking on it.
+					while (newRow > -1 && newRow < rows && newCol > -1 && newCol < columns &&
+						(board[newRow][newCol] == TileType.Wall ||
+							(board[newRow][newCol] == TileType.ExternalDoor && treatExtDoorAsWall)) &&
+						!hasThisSpaceBeenChecked[newRow][newCol])
+					//while (newRow > -1 && newRow < rows && newCol > -1 && newCol < columns &&
+					//	(board[newRow][newCol] == TileType.Wall || board[newRow][newCol] == TileType.ExternalDoor) &&
+					//	!hasThisSpaceBeenChecked[newRow][newCol])
 					{
-						// Add it as a dissolvable wall and mark it as "checked"
-						tmpWall.DissolvableWalls.Add((newRow, newCol));
-						hasThisSpaceBeenChecked[newRow][newCol] = true;
+						// We can create a unique number at the end by multiplying 1 by prime numbers,
+						// based on what walls border this one being checked.
+						int testVal = 1;
 
-						// Continue checking along this direction
-						(newRow, newCol) = GenerateStep(newRow, newCol, dir);
-					}
-					// Otherwise, it's an intersection
-					else
-					{
-						// Set the bookends of the Wall object and add it to the persitent
-						// list of Walls.
-						tmpWall.Pt0 = (thisRow, thisCol);
-						tmpWall.Pt1 = (newRow, newCol);
-						AllWalls.Add(tmpWall);
+						// We will overwrite these temporary X and Y values a lot as we check directions
+						int tmpX;
+						int tmpY;
 
-						// Prevents us from adding an intersection twice to ones
-						// we've already checked.
-						if (!Intersections.Contains((newRow, newCol)) &&
-							!tmpIntersections.Contains((newRow, newCol)))
+						// If the East square does not exist or is a floor, mult by 2
+						(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.East);
+
+						//if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
+						//	board[tmpX][tmpY] == TileType.Floor ||
+						//	board[tmpX][tmpY] == TileType.InteralDoor ||
+						//	(board[tmpX][tmpY] == TileType.ExternalDoor && !treatExtDoorAsWall))
+
+						if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
+							(board[tmpX][tmpY] != TileType.Wall &&
+							!(board[tmpX][tmpY] == TileType.ExternalDoor && treatExtDoorAsWall)))
+
+						//if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
+						//	(board[newRow][newCol] != TileType.Wall &&
+						//	board[newRow][newCol] != TileType.ExternalDoor))
+
+						//if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
+						//	board[tmpX][tmpY] == TileType.Floor)
+						{ testVal *= 2; }
+
+						// If the North square does not exist or is a floor, mult by 3
+						(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.North);
+
+						if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
+							(board[tmpX][tmpY] != TileType.Wall &&
+							!(board[tmpX][tmpY] == TileType.ExternalDoor && treatExtDoorAsWall)))
+						{ testVal *= 3; }
+
+						// If the West square does not exist or is a floor, mult by 5
+						(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.West);
+
+						if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
+							(board[tmpX][tmpY] != TileType.Wall &&
+							!(board[tmpX][tmpY] == TileType.ExternalDoor && treatExtDoorAsWall)))
+						{ testVal *= 5; }
+
+						// If the South square does not exist or is a floor, mult by 7
+						(tmpX, tmpY) = GenerateStep(newRow, newCol, CardinalDirection.South);
+
+						if (tmpX < 0 || tmpX >= rows || tmpY < 0 || tmpY >= columns ||
+							(board[tmpX][tmpY] != TileType.Wall &&
+							!(board[tmpX][tmpY] == TileType.ExternalDoor && treatExtDoorAsWall)))
+						{ testVal *= 7; }
+
+						Debug.Log(testVal.ToString());
+
+						// If the resultant value is 10 or 21, it's a regular wall,
+						// because that means the only walls bordering it are on its
+						// East and West, or North and South, meaning it's not an intersection.
+						if (testVal == 10 || testVal == 21)
 						{
-							tmpIntersections.Enqueue((newRow, newCol));
-						}
+							// Add it as a dissolvable wall and mark it as "checked"
+							tmpWall.DissolvableWalls.Add((newRow, newCol));
+							hasThisSpaceBeenChecked[newRow][newCol] = true;
 
-						// This is just to cancel the while loop,
-						// since we just hit an intersection.
-						newRow = -1;
+							// Continue checking along this direction
+							(newRow, newCol) = GenerateStep(newRow, newCol, dir);
+						}
+						// Otherwise, it's an intersection
+						else
+						{
+							// Set the bookends of the Wall object and add it to the persitent
+							// list of Walls.
+							tmpWall.Pt0 = (thisRow, thisCol);
+							tmpWall.Pt1 = (newRow, newCol);
+							AllWalls.Add(tmpWall);
+
+							// Prevents us from adding an intersection twice to ones
+							// we've already checked.
+							if (!Intersections.Contains((newRow, newCol)) &&
+								!tmpIntersections.Contains((newRow, newCol)))
+							{
+								tmpIntersections.Enqueue((newRow, newCol));
+							}
+
+							// This is just to cancel the while loop,
+							// since we just hit an intersection.
+							newRow = -1;
+						}
 					}
 				}
+
+				// Once we're done checking this intersection, add it to the
+				// persistent list of all unique intersections.
+				Intersections.Add((thisRow, thisCol));
+
 			}
 
-			// Once we're done checking this intersection, add it to the
-			// persistent list of all unique intersections.
-			Intersections.Add((thisRow, thisCol));
+			foreach ((int, int) item in Intersections)
+			{
+				hasThisSpaceBeenChecked[item.Item1][item.Item2] = true;
+			}
 
+			(thisRow, thisCol) = FindFirstInstOfUncheckedTile(TileType.Wall);
+
+			Debug.Log(thisRow.ToString());
 		}
 
 		Debug.Log("Walls: " + AllWalls.Count.ToString() +
@@ -746,10 +790,10 @@ public class MapGenerator : MonoBehaviour
 	/// <summary>
 	/// Determines all separate rooms on the generated map
 	/// </summary>
-	private void FindAllRooms()
+	private void FindAllRooms(bool treatExtDoorAsWall = false)
 	{
 		// Initializes everything
-		AllRooms = new List<Room>();
+		AllRooms.Clear();
 		for (int i = 0; i < hasThisSpaceBeenChecked.Length; i++)
 		{
 			for (int j = 0; j < hasThisSpaceBeenChecked[0].Length; j++)
@@ -819,7 +863,8 @@ public class MapGenerator : MonoBehaviour
 					{
 						// If it's a wall, add the Wall object that it's assigned to to
 						// the temporary room's bordering walls (if it hasn't already been added)
-						if (board[newRow][newCol] == TileType.Wall || board[newRow][newCol] == TileType.ExternalDoor)
+						if (board[newRow][newCol] == TileType.Wall ||
+							(board[newRow][newCol] == TileType.ExternalDoor && treatExtDoorAsWall))
 						{
 							Wall tmpWall = AllWalls.Find(x => (x.DissolvableWalls.Contains((newRow, newCol)) ||
 								x.Pt0 == (newRow, newCol) || x.Pt1 == (newRow, newCol)));
@@ -841,6 +886,57 @@ public class MapGenerator : MonoBehaviour
 			// Once we reach this point, there are no more floor tiles adjacent to the first one
 			// loaded into the checking queue. This completes a room; add the room to the list of all rooms.
 			AllRooms.Add(tmpRoom);
+		}
+	}
+
+	private void GenerateDoors()
+	{
+		for (int i = 0; i < board.Length; i++)
+		{
+			for (int j = 0; j < board[0].Length; j++)
+			{
+				hasThisSpaceBeenChecked[i][j] = false;
+			}
+		}
+
+		Queue<Room> tmpRooms = new Queue<Room>();
+		List<Room> checkedRooms = new List<Room>();
+
+		Queue<Wall> wallsToBreak = new Queue<Wall>();
+
+		(int thisRow, int thisCol) = FindFirstInstOfUncheckedTile(TileType.ExternalDoor);
+
+		Wall tmpWall = AllWalls.Find(x => (x.DissolvableWalls.Contains((thisRow, thisCol)) ||
+			x.Pt0 == (thisRow, thisCol) || x.Pt1 == (thisRow, thisCol)));
+
+		tmpRooms.Enqueue(AllRooms.Find(x => x.BorderWalls.Exists(z => z.ID == tmpWall.ID)));
+
+		while (tmpRooms.Count > 0)
+		{
+			Room tmpRoom = tmpRooms.Dequeue();
+			checkedRooms.Add(tmpRoom);
+
+			foreach (Wall borderWall in tmpRoom.BorderWalls)
+			{
+				Room borderRoom = AllRooms.Find(x => (x.BorderWalls.Exists(z => z.ID == borderWall.ID) &&
+					!checkedRooms.Exists(z => z.ID == x.ID) && !tmpRooms.Contains(x)));
+				if (borderRoom != null)
+				{
+					tmpRooms.Enqueue(borderRoom);
+					wallsToBreak.Enqueue(borderWall);
+				}
+			}
+		}
+
+		while (wallsToBreak.Count > 0)
+		{
+			Wall tmpWallToBreak = wallsToBreak.Dequeue();
+			if (tmpWallToBreak.DissolvableWalls.Count > 0)
+			{
+				(int tmpX, int tmpY) =
+					tmpWallToBreak.DissolvableWalls[random.Next(0, tmpWallToBreak.DissolvableWalls.Count)];
+				board[tmpX][tmpY] = TileType.InteralDoor;
+			}
 		}
 	}
 
@@ -878,7 +974,23 @@ public class MapGenerator : MonoBehaviour
     /// </summary>
     public void GenerateMap() 
     {
-        string md5 = this.CreateMD5(this.seed);
+		//Debug.Log("SEED: " + seed);
+
+		// All the wall stuff
+		Intersections = new List<(int, int)>();
+		AllWalls = new List<Wall>();
+		AllRooms = new List<Room>();
+		hasThisSpaceBeenChecked = new bool[rows][];
+		for (int i = 0; i < rows; i++)
+		{
+			hasThisSpaceBeenChecked[i] = new bool[columns];
+			for (int j = 0; j < columns; j++)
+			{
+				hasThisSpaceBeenChecked[i][j] = false;
+			}
+		}
+
+		string md5 = this.CreateMD5(this.seed);
 
         int numberOfRooms = this.CalculateNumberOfRooms(md5);
         int numberOfPeopleHome = this.CalculateNumberOfPeopleHome(md5);
@@ -895,6 +1007,9 @@ public class MapGenerator : MonoBehaviour
         this.GenerateRooms(numberOfRooms);
         this.KnockDownWalls();
 
+		FindAllWalls(true);
+		FindAllRooms(true);
+		GenerateDoors();
 		FindAllWalls();
 		FindAllRooms();
     }
