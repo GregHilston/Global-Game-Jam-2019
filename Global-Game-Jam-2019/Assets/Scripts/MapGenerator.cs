@@ -80,7 +80,6 @@ public class MapGenerator : MonoBehaviour
         // TODO Start loopable main song
 
         this.seed = "potatoes";
-        //this.GenerateMap();
 
 		// All the wall stuff
 		Intersections = new List<(int, int)>();
@@ -527,7 +526,7 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void GenerateRooms(int numberOfRooms) {
+    private void GenerateRooms() {
         this.GenerateRoomPoints();
         this.GenerateWallsFromRoomPoints();
         this.ReplaceAllRoomPointsWithWalls();
@@ -677,8 +676,6 @@ public class MapGenerator : MonoBehaviour
     private void KnockDownSkinnyRooms()
     {
         int minimumNumberOfHeightOrWidth = 3;
-
-
     }
 
     /// <summary>
@@ -754,8 +751,9 @@ public class MapGenerator : MonoBehaviour
         return rooms.Count;
     }
 
-    private void KnockDownWalls()
+    private void KnockDownWalls(int numberOfRooms)
     {
+        // TODO loop until we have the correct number of rooms
         this.KnockDownSkinnyRooms();
     }
 
@@ -786,8 +784,8 @@ public class MapGenerator : MonoBehaviour
         this.InitializeBoard();
         this.AddOuterWalls();
         this.AddExternalDoor();
-        this.GenerateRooms(numberOfRooms);
-        this.KnockDownWalls();
+        this.GenerateRooms();
+        this.KnockDownWalls(numberOfRooms);
 
         Debug.Log("Number of rooms: " + this.CountRooms().ToString());
 
