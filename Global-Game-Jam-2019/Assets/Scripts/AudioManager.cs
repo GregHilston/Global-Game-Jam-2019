@@ -45,43 +45,43 @@ public class AudioManager : MonoBehaviour
         {
             case AudioFile.MainTheme:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Main Theme";
                 }
             case AudioFile.DoorOpening:
                 {
-                    return "./Audio/Door Opening.mp3";
+                    return "Door Opening";
                 }
             case AudioFile.FootstepsLinolium:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Footsteps (Linolium)";
                 }
             case AudioFile.FootstepsCarpet:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Footsteps(carpet)";
                 }
             case AudioFile.FootstepsWood:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Footsteps(Wood)";
                 }
             case AudioFile.Kick:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Kick(player)";
                 }
             case AudioFile.LiftingGrunt:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Lifting Grunt(player)";
                 }
             case AudioFile.MovingHeavyObject:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Moving Heavy Object";
                 }
             case AudioFile.PickupVase:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Pickup(Vase)";
                 }
             case AudioFile.Scraping:
                 {
-                    return "../Audio/Door Opening.mp3";
+                    return "Scraping Sound";
                 }
 
         }
@@ -92,8 +92,11 @@ public class AudioManager : MonoBehaviour
     public void PlayAudioFile(AudioFile audioFile)
     {
         Debug.Log(Application.dataPath);
-        AudioClip clip = new WWW(@"file:///" + MapAudioFileEnumToFilePath(audioFile)).GetAudioClip();
-        // AudioClip clip = (AudioClip)Resources.Load(audioFilePath);
+
+
+        string audioFilePath = MapAudioFileEnumToFilePath(audioFile);
+
+        AudioClip clip = Resources.Load<AudioClip>(audioFilePath);
 
         mInstance.audioSource.clip = clip;
 
