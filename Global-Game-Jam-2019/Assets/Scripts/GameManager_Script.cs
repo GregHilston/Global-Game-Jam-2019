@@ -10,7 +10,10 @@ public class GameManager_Script : MonoBehaviour
 	public HingeJoint2D CharGrabJoint;
 	public CircleCollider2D TestGrabBox;
 
+	public GameObject WallHitboxPrefab;
+
 	public HUD_Script HUDScr;
+	public MapGenerator MapGenScr;
 
 	public Sprite StandingSpr;
 	public Sprite GrabbingSpr;
@@ -30,6 +33,25 @@ public class GameManager_Script : MonoBehaviour
 		collArr = new Collider2D[1];
 		grabFilter = new ContactFilter2D();
 		grabFilter.SetLayerMask(LayerMask.GetMask("Grabbable"));
+
+		for (int i = 0; i < MapGenScr.AllWalls.Count; i++)
+		{
+			GameObject tmpObj = Instantiate(WallHitboxPrefab, transform);
+			Vector2 aVec = new Vector2(MapGenScr.AllWalls[i].Pt0.Item1, MapGenScr.AllWalls[i].Pt0.Item2);
+			Vector2 bVec = new Vector2(MapGenScr.AllWalls[i].Pt1.Item1, MapGenScr.AllWalls[i].Pt1.Item2);
+			Vector2 cVec = bVec - aVec;
+			tmpObj.transform.localPosition = aVec + (cVec / 2f) -
+				new Vector2(MapGenerator.rows / 2f, MapGenerator.columns / 2f);
+
+			if (Mathf.Abs(cVec.x) < 0.001f)
+			{
+				tmpObj.transform.localScale = new Vector3(1f, Mathf.Abs(cVec.y) + 1f, 1f);
+			}
+			else
+			{
+				tmpObj.transform.localScale = new Vector3(Mathf.Abs(cVec.x) + 1f, 1f, 1f);
+			}
+		}
     }
 
     // Update is called once per frame

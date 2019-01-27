@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,15 +10,15 @@ using UnityEngine;
 /// </summary>
 public class MapGenerator : MonoBehaviour
 {
-    public Camera camera;
+    public Camera cam;
     public string seed;
     private System.Random random;
-    private const int rows = 25;
+    public const int rows = 25;
     private const int firstNonWallRow = 1; // skipping the 0th row, as its a wall
     private const int lastNonWallRow = rows - 2; // -2, 1 for o based and 1 for skipping last row, as its a wall
     private const int lastRow = rows - 1; // -1 to convert from 0 based to 1 based
     private const int firstNonWallColumn = 1; // skipping hthe 0th column, as its a wall
-    private const int columns = 25;
+    public const int columns = 25;
     private const int lastNonWallColumn = columns - 2; // -2, 1 for o based and 1 for skipping last column, as its a wall
     private const int lastColumn = columns - 1; // -1 to convert from 0 based to 1 based
     private const int roomArea = columns * rows;
@@ -37,13 +38,13 @@ public class MapGenerator : MonoBehaviour
         North, South, East, West,
     }
 
-	#region Wall Testing Stuff
+	#region Wall and Room Testing Stuff
 
-	// This is all the stuff involved in testing walls
+	// This is all the stuff involved in testing walls and rooms
 
 	List<(int, int)> Intersections;
 
-	class Wall
+	public class Wall
 	{
 		public (int, int) Pt0 { get; set; } // This should be one intersection
 		public (int, int) Pt1 { get; set; } // This should be second intersection
@@ -57,7 +58,34 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	class Tracker
+	public class Door
+	{
+		public (int, int) Position { get; set; }
+		public int ID { get; private set; }
+
+		public Door(int id)
+		{
+			ID = id;
+		}
+	}
+
+	public class Room
+	{
+		public List<(int, int)> RoomSpaces { get; private set; }
+		public List<Wall> BorderWalls { get; private set; }
+		public List<Door> ConnectingDoors { get; private set; }
+		public int ID { get; private set; }
+
+		public Room(int id)
+		{
+			ID = id;
+			RoomSpaces = new List<(int, int)>();
+			BorderWalls = new List<Wall>();
+			ConnectingDoors = new List<Door>();
+		}
+	}
+
+	public class Tracker
 	{
 		private int thisInt;
 		public int GetInt { get { int copyInt = thisInt; thisInt++; return copyInt; } private set { thisInt = value; } }
@@ -68,7 +96,8 @@ public class MapGenerator : MonoBehaviour
 		}
 	}
 
-	List<Wall> AllWalls;
+	public List<Wall> AllWalls;
+	public List<Room> AllRooms;
 
 	bool[][] hasThisSpaceBeenChecked;
 
@@ -104,61 +133,72 @@ public class MapGenerator : MonoBehaviour
 
     }
 
-    private void OnDrawGizmos()
-    {
-        if (board != null)
-        {
-            // 2d has a zero z plane
-            Vector3 startingPositionTopLeft = this.camera.ScreenToWorldPoint(new Vector3(0, this.camera.pixelHeight, this.camera.nearClipPlane));
+	private void OnDrawGizmos()
+	{
+		if (board != null && AllRooms != null)
+		{
+			// 2d has a zero z plane
+			Vector3 startingPositionTopLeft = this.cam.ScreenToWorldPoint(new Vector3(0, this.cam.pixelHeight, this.cam.nearClipPlane));
 
-            Color[] tileColors = { Color.black, Color.gray, Color.white, Color.cyan, new Color(255, 99, 71), Color.yellow };
+			Color[] tileColors = { Color.black, Color.gray, Color.white, Color.cyan, new Color(255, 99, 71), Color.yellow };
 
-            for (int row = 0; row < this.board.Length; row++)
-            {
-                for (int column = 0; column < this.board[row].Length; column++)
-                {
-                    switch (this.board[row][column])
-                    {
-                        case TileType.Wall:
-                            {
-                                Gizmos.color = tileColors[0];
-                                break;
-                            }
-                        case TileType.Floor:
-                            {
-                                Gizmos.color = tileColors[1];
-                                break;
-                            }
-                        case TileType.ExternalDoor:
-                            {
-                                Gizmos.color = tileColors[2];
-                                break;
-                            }
-                        case TileType.RoomPoint:
-                            {
-                                Gizmos.color = tileColors[3];
-                                break;
-                            }
-                    }
+			for (int row = 0; row < this.board.Length; row++)
+			{
+				for (int column = 0; column < this.board[row].Length; column++)
+				{
+					switch (this.board[row][column])
+					{
+						case TileType.Wall:
+							{
+								if (Intersections.Contains((row, column)))
+								{
+									Gizmos.color = Color.green;
+								}
+								else
+								{
+									Gizmos.color = tileColors[0];
+								}
+								break;
+							}
+						case TileType.Floor:
+							{
+								Gizmos.color = Color.red;
+								//Gizmos.color = new Color(
+								//	(float)AllRooms.Find(x => x.RoomSpaces.Contains((row, column))).ID / (float)AllRooms.Count,
+								//	0f, 0f, 1f);
 
-                    const float sharedUnit = 1.0f;
-                    const float baseXOffset = sharedUnit;
-                    const float baseYOffset = sharedUnit;
-                    const float size = 0.8f;
+								break;
+							}
+						case TileType.ExternalDoor:
+							{
+								Gizmos.color = tileColors[2];
+								break;
+							}
+						case TileType.RoomPoint:
+							{
+								Gizmos.color = tileColors[3];
+								break;
+							}
+					}
 
-                    Gizmos.DrawCube(new Vector3(startingPositionTopLeft.x + baseXOffset * row, startingPositionTopLeft.y + baseYOffset * -column, 0.0f), new Vector3(size, size, size));
-                }
-            }
-        }
-    }
+					const float sharedUnit = 1.0f;
+					const float baseXOffset = sharedUnit;
+					const float baseYOffset = sharedUnit;
+					const float size = 0.8f;
 
-    /// <summary>
-    /// Creates the MD5 hash of a given input.
-    /// From: https://stackoverflow.com/a/24031467/1983957
-    /// </summary>
-    /// <returns>The MD5 Hash</returns>
-    /// <param name="input">Input stirng to calculate.</param>
-    private string CreateMD5(string input)
+					Gizmos.DrawCube(new Vector3(startingPositionTopLeft.x + baseXOffset * row, startingPositionTopLeft.y + baseYOffset * -column, 0.0f), new Vector3(size, size, size));
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Creates the MD5 hash of a given input.
+	/// From: https://stackoverflow.com/a/24031467/1983957
+	/// </summary>
+	/// <returns>The MD5 Hash</returns>
+	/// <param name="input">Input stirng to calculate.</param>
+	private string CreateMD5(string input)
     {
         // Use input string to calculate MD5 hash
         using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
@@ -532,6 +572,26 @@ public class MapGenerator : MonoBehaviour
     }
 
 	/// <summary>
+	/// This is a helper function for FindAllRooms but can be used for other purposes as well.
+	/// </summary>
+	/// <param name="tiletype">The TileType to check for</param>
+	/// <returns></returns>
+	private (int, int) FindFirstInstOfUncheckedTile(TileType tiletype)
+	{
+		for (int i = 0; i < board.Length; i++)
+		{
+			for (int j = 0; j < board[0].Length; j++)
+			{
+				if (board[i][j] == tiletype && !hasThisSpaceBeenChecked[i][j])
+				{
+					return (i, j);
+				}
+			}
+		}
+		return (-1, -1);
+	}
+
+	/// <summary>
 	/// Determines all the walls connected in the generated map
 	/// </summary>
 	private void FindAllWalls()
@@ -542,6 +602,17 @@ public class MapGenerator : MonoBehaviour
 		// Since the point of this method will eventually be to dissolve those wall
 		// tiles in between those intersection points, every wall tile is considered
 		// a "dissolvable" wall as long as it is not an intersection point.
+
+		// Initializes everything
+		AllWalls = new List<Wall>();
+		Intersections = new List<(int, int)>();
+		for (int i = 0; i < hasThisSpaceBeenChecked.Length; i++)
+		{
+			for (int j = 0; j < hasThisSpaceBeenChecked[0].Length; j++)
+			{
+				hasThisSpaceBeenChecked[i][j] = false;
+			}
+		}
 		
 		// Queue that checks every intersection point for walls they define.
 		// Queues up the top left wall tile.
@@ -672,6 +743,107 @@ public class MapGenerator : MonoBehaviour
 			"; Intsecs: " + Intersections.Count.ToString());
 	}
 
+	/// <summary>
+	/// Determines all separate rooms on the generated map
+	/// </summary>
+	private void FindAllRooms()
+	{
+		// Initializes everything
+		AllRooms = new List<Room>();
+		for (int i = 0; i < hasThisSpaceBeenChecked.Length; i++)
+		{
+			for (int j = 0; j < hasThisSpaceBeenChecked[0].Length; j++)
+			{
+				hasThisSpaceBeenChecked[i][j] = false;
+			}
+		}
+
+		// Tracks the current row and column
+		int thisRow;
+		int thisCol;
+
+		// This is used just to produce unique integer IDs
+		Tracker tmpTracker = new Tracker();
+
+		// Since we need to check every direction at every intersection, this array contains
+		// every direction enumeration. We will iterate through it to check all of them.
+		CardinalDirection[] cardinalDirections =
+			{ CardinalDirection.North,
+			CardinalDirection.East,
+			CardinalDirection.South,
+			CardinalDirection.West };
+
+		// Queue for checking floor spaces
+		Queue<(int, int)> tmpSpaces = new Queue<(int, int)>();
+
+		// Keeps looping until there are no more Floor tiles to add to a Room object
+		while (true)
+		{
+			// Returns the first unchecked floor tile.
+			// This returns (-1, -1) if there are none left.
+			(thisRow, thisCol) = FindFirstInstOfUncheckedTile(TileType.Floor);
+			if (thisRow == -1)
+			{
+				// Breaks the while loop if there are no more floor tiles left to check
+				break;
+			}
+
+			// Queues up next floor tile to check
+			tmpSpaces.Enqueue((thisRow, thisCol));
+
+			// Temporary room that tracks bordering walls and all touching floor tiles.
+			Room tmpRoom = new Room(tmpTracker.GetInt);
+
+			// Do this for every floor space you find
+			while (tmpSpaces.Count > 0)
+			{
+				// Checks every floor space in order
+				(thisRow, thisCol) = tmpSpaces.Dequeue();
+
+				// Adds it to the spaces assigned to this unique room
+				tmpRoom.RoomSpaces.Add((thisRow, thisCol));
+
+				// Makes it so we can't recheck a floor tile,
+				// preveting us from adding one floor tile to more than one room.
+				hasThisSpaceBeenChecked[thisRow][thisCol] = true;
+
+				// Checks every direction from this space
+				foreach (CardinalDirection dir in cardinalDirections)
+				{
+					// Starts off in the direction being checked
+					(int newRow, int newCol) = GenerateStep(thisRow, thisCol, dir);
+
+					// If this tile being checked is inside the bounds of the array,
+					// do further checking on it.
+					if (newRow > -1 && newRow < rows && newCol > -1 && newCol < columns)
+					{
+						// If it's a wall, add the Wall object that it's assigned to to
+						// the temporary room's bordering walls (if it hasn't already been added)
+						if (board[newRow][newCol] == TileType.Wall || board[newRow][newCol] == TileType.ExternalDoor)
+						{
+							Wall tmpWall = AllWalls.Find(x => (x.DissolvableWalls.Contains((newRow, newCol)) ||
+								x.Pt0 == (newRow, newCol) || x.Pt1 == (newRow, newCol)));
+							if (tmpWall != null && !tmpRoom.BorderWalls.Exists(x => x.ID == tmpWall.ID))
+							{
+								tmpRoom.BorderWalls.Add(tmpWall);
+							}
+						}
+						// If it's an unchecked floor tile, add it to the queue to be checked
+						else if (board[newRow][newCol] == TileType.Floor && !hasThisSpaceBeenChecked[newRow][newCol])
+						{
+							tmpSpaces.Enqueue((newRow, newCol));
+						}
+						
+					}
+				}
+			}
+
+			// Once we reach this point, there are no more floor tiles adjacent to the first one
+			// loaded into the checking queue. This completes a room; add the room to the list of all rooms.
+			AllRooms.Add(tmpRoom);
+		}
+	}
+
     private void KnockDownSkinnyRooms()
     {
         int minimumNumberOfHeightOrWidth = 3;
@@ -724,6 +896,7 @@ public class MapGenerator : MonoBehaviour
         this.KnockDownWalls();
 
 		FindAllWalls();
+		FindAllRooms();
     }
 }
 

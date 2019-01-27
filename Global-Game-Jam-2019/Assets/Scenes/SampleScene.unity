@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0df6714c262ff8d4b8ea681a5954935e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 1329871229}
+  cam: {fileID: 1329871229}
   seed: potato
 --- !u!1 &1329871227
 GameObject:
