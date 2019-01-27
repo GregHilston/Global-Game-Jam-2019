@@ -39,13 +39,31 @@ public class GameManager_Script : MonoBehaviour
     {
         float heavyMass = 3.0f;
 
+        // STOP IN THE NAME OF MA DUDE
+        if (!isWalking)
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.FootstepsWood);
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Scraping);
+        }
+
+        if (!isGrabbing)
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.LiftingGrunt);
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Scraping);
+        }
+
+        if (!isKicking)
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Kick);
+
+        }
+
+
+        // STARTS 
+
         if (isWalking && !isGrabbing)
         {
             AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
-        }
-        else
-        {
-            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.FootstepsWood);
         }
 
         if (isGrabbing && massOfObject > heavyMass)
@@ -56,19 +74,10 @@ public class GameManager_Script : MonoBehaviour
                 AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.LiftingGrunt);
             }
         }
-        else
-        {
-            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.LiftingGrunt);
-            playedIsGrabbing = false;
-        }
 
         if (isGrabbing && isWalking && massOfObject > heavyMass)
         {
             AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Scraping);
-        }
-        else
-        {
-            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Scraping);
         }
 
         if (isKicking)
@@ -76,10 +85,6 @@ public class GameManager_Script : MonoBehaviour
             Debug.Log("kick!");
             AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Kick);
             isKicking = false;
-        }
-        else
-        {
-            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Kick);
         }
     }
 
