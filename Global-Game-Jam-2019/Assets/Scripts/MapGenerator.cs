@@ -96,6 +96,8 @@ public class MapGenerator : MonoBehaviour
 		}
 
 		GenerateMap();
+
+        AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.DoorOpening);
 	}
 
     // Update is called once per frame
