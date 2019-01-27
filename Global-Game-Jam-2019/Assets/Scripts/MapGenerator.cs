@@ -100,7 +100,7 @@ public class MapGenerator : MonoBehaviour
 	public List<Room> AllRooms;
 	public List<(int, int)> ObjLocations;
 
-	bool[][] hasThisSpaceBeenChecked;
+	public bool[][] hasThisSpaceBeenChecked;
 
 	#endregion
 
@@ -597,7 +597,7 @@ public class MapGenerator : MonoBehaviour
 	/// </summary>
 	/// <param name="tiletype">The TileType to check for</param>
 	/// <returns></returns>
-	private (int, int) FindFirstInstOfUncheckedTile(TileType tiletype)
+	public (int, int) FindFirstInstOfUncheckedTile(TileType tiletype)
 	{
 		for (int i = 0; i < board.Length; i++)
 		{
@@ -742,7 +742,7 @@ public class MapGenerator : MonoBehaviour
 							!(board[tmpX][tmpY] == TileType.ExternalDoor && treatExtDoorAsWall)))
 						{ testVal *= 7; }
 
-						Debug.Log(testVal.ToString());
+						//Debug.Log(testVal.ToString());
 
 						// If the resultant value is 10 or 21, it's a regular wall,
 						// because that means the only walls bordering it are on its
@@ -793,11 +793,11 @@ public class MapGenerator : MonoBehaviour
 
 			(thisRow, thisCol) = FindFirstInstOfUncheckedTile(TileType.Wall);
 
-			Debug.Log(thisRow.ToString());
+			//Debug.Log(thisRow.ToString());
 		}
 
-		Debug.Log("Walls: " + AllWalls.Count.ToString() +
-			"; Intsecs: " + Intersections.Count.ToString());
+		//Debug.Log("Walls: " + AllWalls.Count.ToString() +
+		//	"; Intsecs: " + Intersections.Count.ToString());
 	}
 
 	/// <summary>

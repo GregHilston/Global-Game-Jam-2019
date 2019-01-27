@@ -43,67 +43,67 @@ public class HUD_Script : MonoBehaviour
 			((Timer % 3600) / 60).ToString("00") + ":" +
 			((int)((Timer % 60) * 16.67f)).ToString("000");
 
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
 
-		//
-		// Special testing in Unity Editor only.
-		// This can be used to test changing the percentages of the
-		// house that the player and enemy control at any given time.
-		//
+//		//
+//		// Special testing in Unity Editor only.
+//		// This can be used to test changing the percentages of the
+//		// house that the player and enemy control at any given time.
+//		//
 
-		// Reduces player's percentage by 5%
-		if (Input.GetKeyDown(KeyCode.A))
-		{
-			PlayerPercent -= 0.05f;
-			if (PlayerPercent < 0f)
-			{
-				PlayerPercent = 0f;
-			}
-		}
-		// Increases player's percentage by 5%
-		if (Input.GetKeyDown(KeyCode.D))
-		{
-			PlayerPercent += 0.05f;
-			if (PlayerPercent > 100f)
-			{
-				PlayerPercent = 100f;
-			}
-		}
-		// Reduces enemy's percentage by 5%
-		if (Input.GetKeyDown(KeyCode.LeftArrow))
-		{
-			EnemyPercent -= 0.05f;
-			if (EnemyPercent < 0f)
-			{
-				EnemyPercent = 0f;
-			}
-		}
-		// Increases enemy's percentage by 5%
-		if (Input.GetKeyDown(KeyCode.RightArrow))
-		{
-			EnemyPercent += 0.05f;
-			if (EnemyPercent > 100f)
-			{
-				EnemyPercent = 100f;
-			}
-		}
+//		// Reduces player's percentage by 5%
+//		if (Input.GetKeyDown(KeyCode.A))
+//		{
+//			PlayerPercent -= 0.05f;
+//			if (PlayerPercent < 0f)
+//			{
+//				PlayerPercent = 0f;
+//			}
+//		}
+//		// Increases player's percentage by 5%
+//		if (Input.GetKeyDown(KeyCode.D))
+//		{
+//			PlayerPercent += 0.05f;
+//			if (PlayerPercent > 100f)
+//			{
+//				PlayerPercent = 100f;
+//			}
+//		}
+//		// Reduces enemy's percentage by 5%
+//		if (Input.GetKeyDown(KeyCode.LeftArrow))
+//		{
+//			EnemyPercent -= 0.05f;
+//			if (EnemyPercent < 0f)
+//			{
+//				EnemyPercent = 0f;
+//			}
+//		}
+//		// Increases enemy's percentage by 5%
+//		if (Input.GetKeyDown(KeyCode.RightArrow))
+//		{
+//			EnemyPercent += 0.05f;
+//			if (EnemyPercent > 100f)
+//			{
+//				EnemyPercent = 100f;
+//			}
+//		}
 
-		// Updates player's progress bar
-		PlayerBar.rectTransform.sizeDelta = new Vector2(
-			Mathf.Clamp(PlayerPercent * 100f, 0f, 100f),
-			PlayerBar.rectTransform.sizeDelta.y);
-		PlayerBar.transform.localPosition = new Vector2(
-			Mathf.Clamp(50f - (PlayerPercent * 50f), 0f, 50f) * -1f,
-			PlayerBar.transform.localPosition.y);
-		// Updates enemy's progress bar
-		EnemyBar.rectTransform.sizeDelta = new Vector2(
-			Mathf.Clamp(EnemyPercent * 100f, 0f, 100f),
-			EnemyBar.rectTransform.sizeDelta.y);
-		EnemyBar.transform.localPosition = new Vector2(
-			Mathf.Clamp(50f - (EnemyPercent * 50f), 0f, 50f),
-			EnemyBar.transform.localPosition.y);
+//		// Updates player's progress bar
+//		PlayerBar.rectTransform.sizeDelta = new Vector2(
+//			Mathf.Clamp(PlayerPercent * 100f, 0f, 100f),
+//			PlayerBar.rectTransform.sizeDelta.y);
+//		PlayerBar.transform.localPosition = new Vector2(
+//			Mathf.Clamp(50f - (PlayerPercent * 50f), 0f, 50f) * -1f,
+//			PlayerBar.transform.localPosition.y);
+//		// Updates enemy's progress bar
+//		EnemyBar.rectTransform.sizeDelta = new Vector2(
+//			Mathf.Clamp(EnemyPercent * 100f, 0f, 100f),
+//			EnemyBar.rectTransform.sizeDelta.y);
+//		EnemyBar.transform.localPosition = new Vector2(
+//			Mathf.Clamp(50f - (EnemyPercent * 50f), 0f, 50f),
+//			EnemyBar.transform.localPosition.y);
 
-#endif
+//#endif
 	}
 
 	/// <summary>
