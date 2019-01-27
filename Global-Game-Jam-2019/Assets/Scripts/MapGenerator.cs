@@ -77,12 +77,14 @@ public class MapGenerator : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-        // TODO Start loopable main song
+        string inputSeed = PlayerPrefs.GetString("player_seed", "Potatoes");
+        this.seed = inputSeed;
+        Debug.Log(inputSeed);
 
-        this.seed = "potatoes";
+        //this.GenerateMap();
 
-		// All the wall stuff
-		Intersections = new List<(int, int)>();
+        // All the wall stuff
+        Intersections = new List<(int, int)>();
 		AllWalls = new List<Wall>();
 		hasThisSpaceBeenChecked = new bool[rows][];
 		for (int i = 0; i < rows; i++)
@@ -95,8 +97,6 @@ public class MapGenerator : MonoBehaviour
 		}
 
 		GenerateMap();
-
-        AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.DoorOpening);
 	}
 
     // Update is called once per frame
@@ -179,9 +179,15 @@ public class MapGenerator : MonoBehaviour
 
     private int CalculateNumberOfRooms(string input)
     {
-        // const int indexOfInterest = 0;
+        const int indexOfInterest = 0;
+        string charOfInterest = "" + input[indexOfInterest];
+        int hexCharOfInterest = int.Parse(charOfInterest, System.Globalization.NumberStyles.HexNumber);
 
-        return 6;
+        hexCharOfInterest += 1;
+        int intToReturn = ((hexCharOfInterest * 5)  / 4 );
+        Debug.Log(intToReturn);
+
+        return intToReturn;
     }
 
     private int CalculateNumberOfPeopleHome(string input)
@@ -526,7 +532,7 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void GenerateRooms() {
+    private void GenerateRooms(int numberOfRooms) {
         this.GenerateRoomPoints();
         this.GenerateWallsFromRoomPoints();
         this.ReplaceAllRoomPointsWithWalls();
@@ -676,6 +682,8 @@ public class MapGenerator : MonoBehaviour
     private void KnockDownSkinnyRooms()
     {
         int minimumNumberOfHeightOrWidth = 3;
+
+
     }
 
     /// <summary>
@@ -751,9 +759,8 @@ public class MapGenerator : MonoBehaviour
         return rooms.Count;
     }
 
-    private void KnockDownWalls(int numberOfRooms)
+    private void KnockDownWalls()
     {
-        // TODO loop until we have the correct number of rooms
         this.KnockDownSkinnyRooms();
     }
 
@@ -784,8 +791,8 @@ public class MapGenerator : MonoBehaviour
         this.InitializeBoard();
         this.AddOuterWalls();
         this.AddExternalDoor();
-        this.GenerateRooms();
-        this.KnockDownWalls(numberOfRooms);
+        this.GenerateRooms(numberOfRooms);
+        this.KnockDownWalls();
 
         Debug.Log("Number of rooms: " + this.CountRooms().ToString());
 
