@@ -24,9 +24,12 @@ public class GameManager_Script : MonoBehaviour
 	public Sprite GrabbingSpr;
 	public Sprite[] WalkingSprs;
 
+    public Camera mainCamera;
+
 	bool isGrabbing;
 	bool isWalking;
     bool isKicking;
+    bool isCameraFollowingPlayer = false;
 	Collider2D[] collArr;
 	ContactFilter2D grabFilter;
 
@@ -109,6 +112,24 @@ public class GameManager_Script : MonoBehaviour
 			new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
 	}
 
+    private void ToggleCamera()
+    {
+        isCameraFollowingPlayer = !isCameraFollowingPlayer; // toggle ma dude
+
+        if (isCameraFollowingPlayer)
+        {
+            mainCamera.orthographicSize = 8;
+            mainCamera.transform.SetParent(TestChar.transform);
+            mainCamera.transform.localPosition = new Vector3(0, 0, -10);
+        }
+        else
+        {
+            mainCamera.orthographicSize = 16;
+            mainCamera.transform.SetParent(null);
+            mainCamera.transform.position = new Vector3(0, 0, -10);
+        }
+    }
+
     private void PlayOrStopAppropriateAudio(float massOfObject)
     {
         float heavyMass = 3.0f;
@@ -180,13 +201,18 @@ public class GameManager_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-//#if UNITY_EDITOR
+        //#if UNITY_EDITOR
 
         if (Input.GetKey(KeyCode.Escape)) {
             Application.Quit();
         }
 
-		if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            ToggleCamera();
+        }
+
+        if (Input.GetKey(KeyCode.RightArrow))
 		{
 			TestChar.GetComponent<Rigidbody2D>().velocity += new Vector2(1f, 0f);
 			//TestChar.GetComponent<Animator>().SetBool("isWalking", !isGrabbing);
@@ -324,4 +350,16 @@ public class GameManager_Script : MonoBehaviour
 		}
 		SceneManager.LoadScene("EndMenu");
 	}
+
+    private void Awake()
+    {
+        // CAMERA HACK BOIIIII
+        mainCamera.transform.rotation = Quaternion.identity; // lets not rotate ma dudes
+    }
+
+    private void LateUpdate()
+    {
+        // CAMERA HACK BOIIIII
+        mainCamera.transform.rotation = Quaternion.identity; // lets not rotate ma dudes
+    }
 }
