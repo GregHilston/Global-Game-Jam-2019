@@ -24,6 +24,7 @@ public class AudioManager : MonoBehaviour
 
     static AudioManager mInstance;
     private AudioSource audioSource;
+    private List<AudioFile> currentlyPlaying = new List<AudioFile>();
 
     public static AudioManager Instance
     {
@@ -89,19 +90,32 @@ public class AudioManager : MonoBehaviour
         return "";
     }
 
+    private void AudioFinished(AudioFile audioFile)
+    {
+        this.currentlyPlaying.Remove(audioFile);
+    }
+
     public void PlayAudioFile(AudioFile audioFile)
     {
-        Debug.Log(Application.dataPath);
+        if (!currentlyPlaying.Contains(audioFile)) { 
+            string audioFilePath = MapAudioFileEnumToFilePath(audioFile);
 
+            AudioClip clip = Resources.Load<AudioClip>(audioFilePath);
 
-        string audioFilePath = MapAudioFileEnumToFilePath(audioFile);
+            mInstance.audioSource.clip = clip;
 
-        AudioClip clip = Resources.Load<AudioClip>(audioFilePath);
+            mInstance.audioSource.PlayOneShot(clip);
 
-        mInstance.audioSource.clip = clip;
+            StartCoroutine(StartMethod(audioFile, clip.length));
 
-        Debug.Log(clip);
+            currentlyPlaying.Add(audioFile);
+        }
+    }
 
-        mInstance.audioSource.PlayOneShot(clip);
+    private IEnumerator StartMethod(AudioFile audioFile, float clipLength)
+    {
+        yield return new WaitForSeconds(clipLength);
+
+        AudioFinished(audioFile);
     }
 }
