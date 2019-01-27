@@ -20,8 +20,10 @@ public class GameManager_Script : MonoBehaviour
 	bool isWalking;
 	Collider2D[] collArr;
 	ContactFilter2D grabFilter;
-	
-	// Start is called before the first frame update
+
+    bool playedIsGrabbing = false;
+
+    // Start is called before the first frame update
     void Start()
     {
 		CharGrabJoint.enabled = false;
@@ -30,6 +32,41 @@ public class GameManager_Script : MonoBehaviour
 		collArr = new Collider2D[1];
 		grabFilter = new ContactFilter2D();
 		grabFilter.SetLayerMask(LayerMask.GetMask("Grabbable"));
+    }
+
+    private void PlayOrStopAppropriateAudio()
+    { 
+        if (isWalking && !isGrabbing)
+        {
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
+        }
+        else
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.FootstepsWood);
+        }
+
+        if (isGrabbing)
+        {
+            if (!playedIsGrabbing)
+            {
+                playedIsGrabbing = true;
+                AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.LiftingGrunt);
+            }
+        }
+        else
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.LiftingGrunt);
+            playedIsGrabbing = false;
+        }
+
+        if (isGrabbing && isWalking)
+        {
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Scraping);
+        }
+        else
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.Scraping);
+        }
     }
 
     // Update is called once per frame
@@ -67,15 +104,6 @@ public class GameManager_Script : MonoBehaviour
 			//TestChar.GetComponent<Animator>().SetBool("isWalking", false);
 			isWalking = false;
 		}
-
-        if (isWalking)
-        {
-            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
-        }
-        else
-        {
-            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.FootstepsWood);
-        }
 
         //if (Input.GetKeyDown(KeyCode.A) && (TestObj.transform.position - TestChar.transform.position).magnitude <= 1.5f)
         if (Input.GetKeyDown(KeyCode.A) && TestGrabBox.OverlapCollider(grabFilter, collArr) == 1)
@@ -131,6 +159,7 @@ public class GameManager_Script : MonoBehaviour
 			}
 		}
 
+        PlayOrStopAppropriateAudio();
 //#endif
 	}
 }

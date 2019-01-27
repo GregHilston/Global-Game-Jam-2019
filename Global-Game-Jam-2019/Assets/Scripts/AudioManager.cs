@@ -96,20 +96,20 @@ public class AudioManager : MonoBehaviour
 
     public void PlayAudioFile(AudioFile audioFile)
     {
-        if (!currentlyPlaying.ContainsKey(audioFile)) { 
+        if (!currentlyPlaying.ContainsKey(audioFile)) {
+            AudioSource audioSource = gameObject.AddComponent<AudioSource>();
+            currentlyPlaying.Add(audioFile, audioSource);
+
             string audioFilePath = MapAudioFileEnumToFilePath(audioFile);
 
             AudioClip clip = Resources.Load<AudioClip>(audioFilePath);
 
-            AudioSource audioSource = gameObject.AddComponent<AudioSource>();
 
             audioSource.clip = clip;
 
             audioSource.PlayOneShot(clip);
 
             StartCoroutine(StartMethod(audioFile, clip.length));
-
-            currentlyPlaying.Add(audioFile, audioSource);
         }
     }
 
@@ -117,7 +117,6 @@ public class AudioManager : MonoBehaviour
     {
         if (currentlyPlaying.ContainsKey(audioFile))
         {
-            Debug.Log("STOP");
             currentlyPlaying[audioFile].Stop();
             currentlyPlaying.Remove(audioFile);
         }
