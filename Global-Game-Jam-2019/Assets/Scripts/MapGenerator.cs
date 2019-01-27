@@ -77,6 +77,8 @@ public class MapGenerator : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
+        // TODO Start loopable main song
+
         this.seed = "potatoes";
         //this.GenerateMap();
 
