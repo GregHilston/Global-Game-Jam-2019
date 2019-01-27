@@ -1,4 +1,6 @@
-![Home Is Where You Break In](https://raw.githubusercontent.com/GregHilston/Global-Game-Jam-2019/master/Global-Game-Jam-2019/Assets/Art/Home-is-Where.png)
+![Home Is Where You Break In](https://raw.githubusercontent.com/GregHilston/Global-Game-Jam-2019/master/Global-Game-Jam-2019/Assets/Art/in_game.png)
+
+![Game Screenshot](https://raw.githubusercontent.com/GregHilston/Global-Game-Jam-2019/master/Global-Game-Jam-2019/Assets/Art/Home-is-Where.png)
 
 > "Break into homes and establish it as your home"
 
