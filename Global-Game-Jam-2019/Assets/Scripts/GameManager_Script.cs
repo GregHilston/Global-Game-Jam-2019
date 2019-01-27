@@ -10,7 +10,14 @@ public class GameManager_Script : MonoBehaviour
 	public HingeJoint2D CharGrabJoint;
 	public CircleCollider2D TestGrabBox;
 
+	public GameObject WallHitboxPrefab;
+	public GameObject FloorTilePrefab;
+
+	public GameObject[] RedObjs;
+	public GameObject[] BlueObjs;
+
 	public HUD_Script HUDScr;
+	public MapGenerator MapGenScr;
 
 	public Sprite StandingSpr;
 	public Sprite GrabbingSpr;
@@ -21,6 +28,8 @@ public class GameManager_Script : MonoBehaviour
     bool isKicking;
 	Collider2D[] collArr;
 	ContactFilter2D grabFilter;
+
+	Random rand;
 
     bool playedIsGrabbing = false;
 
@@ -35,6 +44,55 @@ public class GameManager_Script : MonoBehaviour
 		collArr = new Collider2D[1];
 		grabFilter = new ContactFilter2D();
 		grabFilter.SetLayerMask(LayerMask.GetMask("Grabbable"));
+
+		rand = new Random();
+
+		//MapGenScr.GenerateMap();
+
+		for (int i = 0; i < MapGenScr.AllWalls.Count; i++)
+		{
+			GameObject tmpObj = Instantiate(WallHitboxPrefab, transform);
+			Vector2 aVec = new Vector2(MapGenScr.AllWalls[i].Pt0.Item1, MapGenScr.AllWalls[i].Pt0.Item2);
+			Vector2 bVec = new Vector2(MapGenScr.AllWalls[i].Pt1.Item1, MapGenScr.AllWalls[i].Pt1.Item2);
+			Vector2 cVec = bVec - aVec;
+			tmpObj.transform.localPosition = aVec + (cVec / 2f) -
+				new Vector2(MapGenerator.rows / 2f, MapGenerator.columns / 2f);
+
+			if (Mathf.Abs(cVec.x) < 0.001f)
+			{
+				tmpObj.transform.localScale = new Vector3(1f, Mathf.Abs(cVec.y) + 1f, 1f);
+			}
+			else
+			{
+				tmpObj.transform.localScale = new Vector3(Mathf.Abs(cVec.x) + 1f, 1f, 1f);
+			}
+		}
+		for (int i = 0; i < MapGenScr.board.Length; i++)
+		{
+			for (int j = 0; j < MapGenScr.board[0].Length; j++)
+			{
+				if (MapGenScr.board[i][j] == MapGenerator.TileType.Floor ||
+					MapGenScr.board[i][j] == MapGenerator.TileType.InteralDoor)
+				{
+					GameObject tmpObj = Instantiate(FloorTilePrefab, transform);
+					tmpObj.transform.localPosition = new Vector3(i, j, 2f) -
+						new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
+				}
+			}
+		}
+
+		for (int i = 0; i < MapGenScr.ObjLocations.Count; i++)
+		{
+			GameObject tmpObj = Instantiate(RedObjs[Random.Range(0,RedObjs.Length)], transform);
+			tmpObj.transform.localPosition =
+				new Vector3(MapGenScr.ObjLocations[i].Item1, MapGenScr.ObjLocations[i].Item2, 1f) -
+				new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
+
+			GameObject tmpObj2 = Instantiate(BlueObjs[Random.Range(0, BlueObjs.Length)], transform);
+			tmpObj2.transform.localPosition =
+				new Vector3(2f * i, -1f, 1f) -
+				new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
+		}
     }
 
     private void PlayOrStopAppropriateAudio(float massOfObject)
