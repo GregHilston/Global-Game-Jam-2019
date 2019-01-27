@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager_Script : MonoBehaviour
 {
@@ -96,7 +97,20 @@ public class GameManager_Script : MonoBehaviour
 				new Vector3(2f * i, -1f, 1f) -
 				new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
 		}
-    }
+
+		for (int i = 0; i < MapGenScr.board.Length; i++)
+		{
+			for (int j = 0; j < MapGenScr.board[0].Length; j++)
+			{
+				MapGenScr.hasThisSpaceBeenChecked[i][j] = false;
+			}
+		}
+
+		(int tmpX, int tmpY) = MapGenScr.FindFirstInstOfUncheckedTile(MapGenerator.TileType.ExternalDoor);
+		TestChar.transform.position =
+			new Vector3(tmpX, tmpY, 0f) -
+			new Vector3(MapGenerator.rows / 2f, MapGenerator.columns / 2f, 0f);
+	}
 
     private void ToggleCamera()
     {
@@ -285,7 +299,61 @@ public class GameManager_Script : MonoBehaviour
 		}
 
         PlayOrStopAppropriateAudio(CharGrabJoint.connectedBody.mass);
-//#endif
+
+		List<GameObject> allTmpObjs = new List<GameObject>();
+		allTmpObjs.AddRange(GameObject.FindGameObjectsWithTag("Blue"));
+		allTmpObjs.AddRange(GameObject.FindGameObjectsWithTag("Red"));
+
+		//Debug.Log("BEFORE: " + allTmpObjs.Count.ToString());
+
+		allTmpObjs.RemoveAll(m =>
+			m.transform.position.x < MapGenerator.rows / -2f ||
+			m.transform.position.x > MapGenerator.rows / 2f ||
+			m.transform.position.y < MapGenerator.columns / -2f ||
+			m.transform.position.y > MapGenerator.columns / 2f);
+
+		//Debug.Log("AFTER: " + allTmpObjs.Count.ToString());
+
+		float blueInHouse = allTmpObjs.FindAll(x => x.tag == "Blue").Count;
+		float redInHouse = allTmpObjs.FindAll(x => x.tag == "Red").Count;
+
+		//Debug.Log("BLUE: " + blueInHouse.ToString() + "; RED: " + redInHouse.ToString());
+
+		//if (Input.GetKeyDown(KeyCode.L))
+		//{
+		//	blueInHouse = 11f;
+		//}
+
+		if (allTmpObjs.Count < 1)
+		{
+			HUDScr.OnControlChange(0f, 0f);
+		}
+		else
+		{
+			if (blueInHouse / allTmpObjs.Count >= 1f && blueInHouse > 9f)
+			{
+				calculateHighScoreAndEndGame();
+			}
+			else
+			{
+				HUDScr.OnControlChange(blueInHouse / allTmpObjs.Count, redInHouse / allTmpObjs.Count);
+			}
+		}
+		//#endif
+	}
+
+	void calculateHighScoreAndEndGame()
+	{
+		string highScoreSeed = PlayerPrefs.GetString("high_score_seed", "NONE");
+		string seed = PlayerPrefs.GetString("player_seed", "NONE");
+		int highScore = PlayerPrefs.GetInt("highscore", 0);
+		int score = PlayerPrefs.GetInt("player_time", 0);
+		if (score < highScore)
+		{
+			PlayerPrefs.SetInt("highscore", score);
+			PlayerPrefs.SetString("high_score_seed", seed);
+		}
+		SceneManager.LoadScene("EndMenu");
 	}
 
     private void Awake()

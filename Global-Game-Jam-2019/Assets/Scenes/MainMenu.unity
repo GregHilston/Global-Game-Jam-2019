@@ -1519,7 +1519,7 @@ MonoBehaviour:
   m_Text: "INSTUCTIONS: Take over the house!\r Grab furniture from the house and move
     it out, move out the person\u2019s stuff as fast as you can. Use the arrow keys
     to move your character and press 'S' to grab furniture and press 'A' to kick grabbed
-    objects.\n\n"
+    objects. Press C to change camera zoom.\n\n"
 --- !u!222 &1381320100
 CanvasRenderer:
   m_ObjectHideFlags: 0
