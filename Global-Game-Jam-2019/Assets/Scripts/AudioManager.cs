@@ -16,4 +16,16 @@ public class AudioManager
         PickupVase,
         Scraping, 
     }
+
+    private AudioManager()
+    {
+        // Prevent outside instantiation
+    }
+
+    private static readonly AudioManager instance = new AudioManager();
+
+    public static AudioManager GetInstance()
+    {
+        return instance;
+    }
 }
