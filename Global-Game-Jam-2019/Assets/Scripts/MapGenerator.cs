@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 /// <summary>
 /// Map generator.
@@ -77,7 +78,7 @@ public class MapGenerator : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-        this.seed = "potatoes";
+        this.seed = "potatoesd";
         //this.GenerateMap();
 
 		// All the wall stuff
@@ -100,6 +101,54 @@ public class MapGenerator : MonoBehaviour
     void Update()
     {
 
+    }
+
+    private void DrawAsciiBoard(string title="")
+    {
+        string path = "test.txt";
+        //Write some text to the test.txt file
+        StreamWriter writer = new StreamWriter(path, true);
+        writer.WriteLine(title);
+
+        for (int i = 0; i < rows; i++)
+        {
+            string row = "";
+            for (int j = 0; j < columns; j++)
+            {
+                switch(board[i][j])
+                {
+                    case TileType.Wall:
+                        {
+                            row += "W";
+                            break;
+                        }
+                    case TileType.ExternalDoor:
+                        {
+                            row += "E";
+                            break;
+                        }
+                    case TileType.Floor:
+                        {
+                            row += "F";
+                            break;
+                        }
+                    case TileType.RoomPoint:
+                        {
+                            row += "R";
+                            break;
+                        }
+                }
+            }
+            Debug.Log(row + "\n");
+
+            //Write some text to the test.txt file
+            writer.WriteLine(row);
+        }
+
+
+        //Write some text to the test.txt file
+        writer.WriteLine("\n");
+        writer.Close();
     }
 
     private void OnDrawGizmos()
@@ -367,6 +416,13 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
+        string path = "test.txt";
+        //Write some text to the test.txt file
+        StreamWriter writer = new StreamWriter(path, true);
+        writer.WriteLine("Room Points In ClosestRoomPointsByRowOrColumnOrExternalWall");
+        writer.WriteLine(roomPoints);
+       
+
         for (int i = 0; i < roomPoints.Count; i++)
         {
             for (int j = i + 1; j < roomPoints.Count; j++)
@@ -384,34 +440,39 @@ public class MapGenerator : MonoBehaviour
                 {
                     shortestDistance = columnDistanceBetweenIAndJ;
                 }
+            }
 
-                // Rows Walls
-                int distanceToFirstRow = Mathf.Abs(roomPoints[i].Item1 - 0);
-                if (distanceToFirstRow < shortestDistance)
-                {
-                    shortestDistance = distanceToFirstRow;
-                }
+            // Rows Walls
+            int distanceToFirstRow = Mathf.Abs(roomPoints[i].Item1 - 0);
+            if (distanceToFirstRow < shortestDistance)
+            {
+                shortestDistance = distanceToFirstRow;
+            }
 
-                int distanceToLastRow = Mathf.Abs(roomPoints[i].Item1 - lastRow);
-                if (distanceToLastRow < shortestDistance)
-                {
-                    shortestDistance = distanceToLastRow;
-                }
+            int distanceToLastRow = Mathf.Abs(roomPoints[i].Item1 - lastRow);
+            if (distanceToLastRow < shortestDistance)
+            {
+                shortestDistance = distanceToLastRow;
+            }
 
-                // Column Walls
-                int distanceToFirstColumn = Mathf.Abs(roomPoints[i].Item2 - 0);
-                if (distanceToFirstColumn < shortestDistance)
-                {
-                    shortestDistance = distanceToFirstColumn;
-                }
+            // Column Walls
+            int distanceToFirstColumn = Mathf.Abs(roomPoints[i].Item2 - 0);
+            if (distanceToFirstColumn < shortestDistance)
+            {
+                shortestDistance = distanceToFirstColumn;
+            }
 
-                int distanceToLastColumn = Mathf.Abs(roomPoints[i].Item2 - lastColumn);
-                if (distanceToLastColumn < shortestDistance)
-                {
-                    shortestDistance = distanceToLastColumn;
-                }
+            int distanceToLastColumn = Mathf.Abs(roomPoints[i].Item2 - lastColumn);
+            if (distanceToLastColumn < shortestDistance)
+            {
+                shortestDistance = distanceToLastColumn;
             }
         }
+
+        writer.WriteLine("shortestDistance: " + shortestDistance);
+        writer.Close();
+
+        DrawAsciiBoard("END OF ClosestRoomPointsByRowOrColumnOrExternalWall");
 
         return shortestDistance;
     }
@@ -525,6 +586,7 @@ public class MapGenerator : MonoBehaviour
 
     private void GenerateRooms(int numberOfRooms) {
         this.GenerateRoomPoints();
+        DrawAsciiBoard("GenerateRoomPoints");
         this.GenerateWallsFromRoomPoints();
         this.ReplaceAllRoomPointsWithWalls();
     }
@@ -754,6 +816,40 @@ public class MapGenerator : MonoBehaviour
         return rooms.Count;
     }
 
+    private bool IsExternalWall(int i)
+    {
+        for (int j = 0; j < AllWalls[i].DissolvableWalls.Count; j++)
+        {
+            int row = AllWalls[i].DissolvableWalls[j].Item1;
+            int column = AllWalls[i].DissolvableWalls[j].Item2;
+
+            (int northRow, int northColumn) = GenerateStep(row, column, CardinalDirection.North);
+            (int eastRow, int eastColumn) = GenerateStep(row, column, CardinalDirection.East);
+            (int southRow, int southColumn) = GenerateStep(row, column, CardinalDirection.South);
+            (int westRow, int westColumn) = GenerateStep(row, column, CardinalDirection.West);
+
+            // note -1 and rows/colunms is correct, cause we're checking if we've gone off the board by one
+            if (northRow == -1 || northRow == rows || northColumn == -1 || northColumn == columns)
+            {
+                return true;
+            }
+            if (eastRow == -1 || eastRow == rows || eastColumn == -1 || eastColumn == columns)
+            {
+                return true;
+            }
+            if (southRow == -1 || southRow == rows || southColumn == -1 || southColumn == columns)
+            {
+                return true;
+            }
+            if (westRow == -1 || westRow == rows || westColumn == -1 || westColumn == columns)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void RemoveSingleWall()
     {
         Debug.Log("Start RemoveSingleWall CountRooms(): " + CountRooms().ToString());
@@ -764,7 +860,7 @@ public class MapGenerator : MonoBehaviour
 
         for (int i = 0; i < AllWalls.Count; i++)
         {
-            if (AllWalls[i].DissolvableWalls.Count < smallestWallLength)
+            if (AllWalls[i].DissolvableWalls.Count < smallestWallLength || !IsExternalWall(i))
             {
                 smallestWallLength = AllWalls[i].DissolvableWalls.Count;
                 smallestWallIndex = i;
@@ -775,17 +871,20 @@ public class MapGenerator : MonoBehaviour
             board[AllWalls[smallestWallIndex].DissolvableWalls[i].Item1][AllWalls[smallestWallIndex].DissolvableWalls[i].Item2] = TileType.Floor;
         }
         AllWalls[smallestWallIndex].DissolvableWalls.Clear();
+        AllWalls.RemoveAt(smallestWallIndex);
 
         Debug.Log("Finish RemoveSingleWall CountRooms(): " + CountRooms().ToString());
     }
 
     private void KnockDownWalls(int numberOfDesiredRooms)
     {
+        int numberOfRooms = CountRooms();
         Debug.Log("numberOfDesiredRooms: " + numberOfDesiredRooms.ToString());
-        Debug.Log("Start CountRooms(): " + CountRooms().ToString());
-        while(CountRooms() != numberOfDesiredRooms)
+        Debug.Log("Start CountRooms(): " + numberOfRooms.ToString());
+        while(numberOfRooms != numberOfDesiredRooms)
         {
             RemoveSingleWall();
+            numberOfRooms = CountRooms();
         }
         Debug.Log("Finish CountRooms(): " + CountRooms().ToString());
     }
@@ -815,11 +914,32 @@ public class MapGenerator : MonoBehaviour
         this.random =  new System.Random(unityRandomSeed);
 
         this.InitializeBoard();
+
+        DrawAsciiBoard("InitializeBoard");
+
         this.AddOuterWalls();
+
+        DrawAsciiBoard("AddOuterWalls");
+
         this.AddExternalDoor();
+
+        DrawAsciiBoard("AddExternalDoor");
+
         this.GenerateRooms(numberOfRooms);
-        this.KnockDownWalls(numberOfRooms);
+
+        DrawAsciiBoard("GenerateRooms");
+
         FindAllWalls();
+
+        DrawAsciiBoard("FindAllWalls");
+
+        this.KnockDownWalls(numberOfRooms);
+
+        DrawAsciiBoard("KnockDownWalls");
+
+        FindAllWalls();
+
+        DrawAsciiBoard("FindAllWalls");
     }
 }
 
