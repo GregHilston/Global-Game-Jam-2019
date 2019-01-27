@@ -223,9 +223,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c425fb06275484c4784d226ce8fb4d25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimerText: {fileID: 1687963534}
-  PlayerBar: {fileID: 536498315}
-  EnemyBar: {fileID: 1104294235}
 --- !u!114 &106512051
 MonoBehaviour:
   m_ObjectHideFlags: 0
