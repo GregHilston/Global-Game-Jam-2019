@@ -34,8 +34,10 @@ public class GameManager_Script : MonoBehaviour
 		grabFilter.SetLayerMask(LayerMask.GetMask("Grabbable"));
     }
 
-    private void PlayOrStopAppropriateAudio()
-    { 
+    private void PlayOrStopAppropriateAudio(float massOfObject)
+    {
+        float heavyMass = 3.0f;
+
         if (isWalking && !isGrabbing)
         {
             AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
@@ -45,7 +47,7 @@ public class GameManager_Script : MonoBehaviour
             AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.FootstepsWood);
         }
 
-        if (isGrabbing)
+        if (isGrabbing && massOfObject > heavyMass)
         {
             if (!playedIsGrabbing)
             {
@@ -59,7 +61,7 @@ public class GameManager_Script : MonoBehaviour
             playedIsGrabbing = false;
         }
 
-        if (isGrabbing && isWalking)
+        if (isGrabbing && isWalking && massOfObject > heavyMass)
         {
             AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Scraping);
         }
@@ -159,7 +161,7 @@ public class GameManager_Script : MonoBehaviour
 			}
 		}
 
-        PlayOrStopAppropriateAudio();
+        PlayOrStopAppropriateAudio(CharGrabJoint.connectedBody.mass);
 //#endif
 	}
 }
