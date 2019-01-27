@@ -40,6 +40,8 @@ public class MapGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.MainTheme, true);
+
         this.seed = "potatoes";
         this.GenerateMap();
     }
