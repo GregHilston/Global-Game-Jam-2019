@@ -40,7 +40,9 @@ public class GameManager_Script : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.MainTheme, true);
+		Application.targetFrameRate = 60;
+
+		AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.MainTheme, true);
 
         CharGrabJoint.enabled = false;
 		isGrabbing = false;
