@@ -77,11 +77,14 @@ public class MapGenerator : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-        this.seed = "potatoes";
+        string inputSeed = PlayerPrefs.GetString("player_seed", "Potatoes");
+        this.seed = inputSeed;
+        Debug.Log(inputSeed);
+
         //this.GenerateMap();
 
-		// All the wall stuff
-		Intersections = new List<(int, int)>();
+        // All the wall stuff
+        Intersections = new List<(int, int)>();
 		AllWalls = new List<Wall>();
 		hasThisSpaceBeenChecked = new bool[rows][];
 		for (int i = 0; i < rows; i++)
@@ -176,9 +179,15 @@ public class MapGenerator : MonoBehaviour
 
     private int CalculateNumberOfRooms(string input)
     {
-        // const int indexOfInterest = 0;
+        const int indexOfInterest = 0;
+        string charOfInterest = "" + input[indexOfInterest];
+        int hexCharOfInterest = int.Parse(charOfInterest, System.Globalization.NumberStyles.HexNumber);
 
-        return 6;
+        hexCharOfInterest += 1;
+        int intToReturn = ((hexCharOfInterest * 5)  / 4 );
+        Debug.Log(intToReturn);
+
+        return intToReturn;
     }
 
     private int CalculateNumberOfPeopleHome(string input)
