@@ -116,7 +116,8 @@ public class AudioManager : MonoBehaviour
                 audioSource.loop = true;
             }
 
-            audioSource.PlayOneShot(clip);
+            audioSource.clip = clip;
+            audioSource.Play();
 
             Debug.Log("Really kick!");
             Debug.Log("clip: " + clip);
