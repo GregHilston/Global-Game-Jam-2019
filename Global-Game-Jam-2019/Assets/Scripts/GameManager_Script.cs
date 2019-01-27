@@ -68,8 +68,13 @@ public class GameManager_Script : MonoBehaviour
 			isWalking = false;
 		}
 
-		//if (Input.GetKeyDown(KeyCode.A) && (TestObj.transform.position - TestChar.transform.position).magnitude <= 1.5f)
-		if (Input.GetKeyDown(KeyCode.A) && TestGrabBox.OverlapCollider(grabFilter, collArr) == 1)
+        if (isWalking)
+        {
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
+        }
+
+        //if (Input.GetKeyDown(KeyCode.A) && (TestObj.transform.position - TestChar.transform.position).magnitude <= 1.5f)
+        if (Input.GetKeyDown(KeyCode.A) && TestGrabBox.OverlapCollider(grabFilter, collArr) == 1)
 		{
 			CharGrabJoint.enabled = true;
 			CharGrabJoint.connectedBody = collArr[0].GetComponent<Rigidbody2D>();
