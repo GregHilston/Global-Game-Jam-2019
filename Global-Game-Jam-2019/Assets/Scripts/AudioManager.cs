@@ -15,6 +15,7 @@ public class AudioManager : MonoBehaviour
         MovingHeavyObject,
         PickupVase,
         Scraping, 
+        Dog,
     }
 
     private AudioManager()
@@ -83,6 +84,10 @@ public class AudioManager : MonoBehaviour
                 {
                     return "Scraping Sound";
                 }
+            case AudioFile.Dog:
+                {
+                    return "Dog";
+                }
 
         }
 
@@ -104,10 +109,12 @@ public class AudioManager : MonoBehaviour
 
             AudioClip clip = Resources.Load<AudioClip>(audioFilePath);
 
-
             audioSource.clip = clip;
 
             audioSource.PlayOneShot(clip);
+
+            Debug.Log("Really kick!");
+            Debug.Log("clip: " + clip);
 
             StartCoroutine(StartMethod(audioFile, clip.length));
         }

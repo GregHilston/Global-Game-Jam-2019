@@ -38,6 +38,8 @@ public class GameManager_Script : MonoBehaviour
     private void PlayOrStopAppropriateAudio(float massOfObject)
     {
         float heavyMass = 3.0f;
+        float dogMass = 0.0f;
+        float floatSubstraction = 0.5f;
 
         // STOP IN THE NAME OF MA DUDE
         if (!isWalking)
@@ -66,12 +68,25 @@ public class GameManager_Script : MonoBehaviour
             AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
         }
 
-        if (isGrabbing && massOfObject > heavyMass)
+        if (isGrabbing && massOfObject >= heavyMass)
         {
             if (!playedIsGrabbing)
             {
                 playedIsGrabbing = true;
                 AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.LiftingGrunt);
+            }
+        }
+        else if (isGrabbing && (massOfObject - dogMass) < floatSubstraction)
+        {
+            playedIsGrabbing = true;
+            AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.Dog);
+        }
+        else if (isGrabbing && massOfObject < heavyMass)
+        {
+            if (!playedIsGrabbing)
+            {
+                playedIsGrabbing = true;
+                AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.PickupVase);
             }
         }
 
