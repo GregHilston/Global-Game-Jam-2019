@@ -8,9 +8,11 @@ using UnityEngine.UI; // Required when Using UI elements.
 public class endGameScript : MonoBehaviour
 {
     public Button menuButton, quitButton;
-    public Text seedText;
+    public Text seedText, highScoreText;
     public string seedString = "";
     public string seed = "";
+    public string highScore = "";
+    public int  score = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +24,10 @@ public class endGameScript : MonoBehaviour
     void Update()
     {
         seed = PlayerPrefs.GetString("player_seed", "NO SEED FOUND");
-        seedString = ("Your Map's See was: " + seed);
+        score = PlayerPrefs.GetInt("player_time", 0);
+        seedString = ("Your Map's Seed was: " + seed);
+        highScore = ("Your time through the level was: " + score);
+        highScoreText.text = highScore;
         seedText.text = seedString;
     }
 
