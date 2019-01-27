@@ -23,8 +23,8 @@ public class AudioManager : MonoBehaviour
     }
 
     static AudioManager mInstance;
-    private AudioSource audioSource;
-    private List<AudioFile> currentlyPlaying = new List<AudioFile>();
+    private Dictionary<AudioFile, AudioSource> currentlyPlaying = new Dictionary<AudioFile, AudioSource>();
+
 
     public static AudioManager Instance
     {
@@ -33,7 +33,6 @@ public class AudioManager : MonoBehaviour
             if (mInstance == null) {
                 GameObject gameObject = new GameObject();
                 mInstance = gameObject.AddComponent<AudioManager>();
-                mInstance.audioSource = gameObject.AddComponent<AudioSource>();
             }
 
             return mInstance;
@@ -97,18 +96,30 @@ public class AudioManager : MonoBehaviour
 
     public void PlayAudioFile(AudioFile audioFile)
     {
-        if (!currentlyPlaying.Contains(audioFile)) { 
+        if (!currentlyPlaying.ContainsKey(audioFile)) { 
             string audioFilePath = MapAudioFileEnumToFilePath(audioFile);
 
             AudioClip clip = Resources.Load<AudioClip>(audioFilePath);
 
-            mInstance.audioSource.clip = clip;
+            AudioSource audioSource = gameObject.AddComponent<AudioSource>();
 
-            mInstance.audioSource.PlayOneShot(clip);
+            audioSource.clip = clip;
+
+            audioSource.PlayOneShot(clip);
 
             StartCoroutine(StartMethod(audioFile, clip.length));
 
-            currentlyPlaying.Add(audioFile);
+            currentlyPlaying.Add(audioFile, audioSource);
+        }
+    }
+
+    public void StopAudioFile(AudioFile audioFile)
+    {
+        if (currentlyPlaying.ContainsKey(audioFile))
+        {
+            Debug.Log("STOP");
+            currentlyPlaying[audioFile].Stop();
+            currentlyPlaying.Remove(audioFile);
         }
     }
 

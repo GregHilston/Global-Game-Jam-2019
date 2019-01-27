@@ -72,6 +72,10 @@ public class GameManager_Script : MonoBehaviour
         {
             AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.FootstepsWood);
         }
+        else
+        {
+            AudioManager.Instance.StopAudioFile(AudioManager.AudioFile.FootstepsWood);
+        }
 
         //if (Input.GetKeyDown(KeyCode.A) && (TestObj.transform.position - TestChar.transform.position).magnitude <= 1.5f)
         if (Input.GetKeyDown(KeyCode.A) && TestGrabBox.OverlapCollider(grabFilter, collArr) == 1)
