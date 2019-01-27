@@ -77,8 +77,9 @@ public class MapGenerator : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-        this.seed = "potatoesd";
-        //this.GenerateMap();
+        // TODO Start loopable main song
+
+        this.seed = "potatoes";
 
 		// All the wall stuff
 		Intersections = new List<(int, int)>();
@@ -94,6 +95,8 @@ public class MapGenerator : MonoBehaviour
 		}
 
 		GenerateMap();
+
+        AudioManager.Instance.PlayAudioFile(AudioManager.AudioFile.DoorOpening);
 	}
 
     // Update is called once per frame
