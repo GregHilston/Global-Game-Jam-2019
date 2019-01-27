@@ -15,6 +15,7 @@ public class generateSeed : MonoBehaviour
     public string seed = "";
     public string highScoreSeed = "";
     public int scoreTime;
+    public Image instuctionBackground;
     // Start is called before the first frame update
     void Start()
     {
@@ -53,10 +54,13 @@ public class generateSeed : MonoBehaviour
         if (instructions.gameObject.activeSelf == false)
         { 
             instructions.gameObject.SetActive(true);
+            instuctionBackground.gameObject.SetActive(true);
+
         }
         else
         {
             instructions.gameObject.SetActive(false);
+            instuctionBackground.gameObject.SetActive(false);
         }
 
     }
