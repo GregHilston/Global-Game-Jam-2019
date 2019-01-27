@@ -10,27 +10,33 @@ public class generateSeed : MonoBehaviour
 {
     public InputField mainInputField;
     public Button generateSeedButton, playButton, createSeed, instructionButton;
-    public Text seedText;
-    public Text instructions;
-    public Text highScore;
+    public Text seedText, instructions, highScore, highScoreSeedText;
     public string seedString = "";
     public string seed = "";
+    public string highScoreSeed = "";
     public int scoreTime;
     // Start is called before the first frame update
     void Start()
     {
         //scoreTime = PlayerPrefs.GetInt("player_time", 0);
-        scoreTime = 1350;
+        scoreTime = PlayerPrefs.GetInt("highscore", 0);
+        highScoreSeed = PlayerPrefs.GetString("high_score_seed", "NONE");
         if (scoreTime > 0)
         {
             highScore.text =  "Fastest Time: " + scoreTime + " Seconds";
             highScore.gameObject.SetActive(true);
         }
-           
+        if (highScoreSeed != "NONE")
+        {
+            highScoreSeedText.text = "Fastest Time Seed: " + highScoreSeed;
+            highScoreSeedText.gameObject.SetActive(true);
+        }
+
 
 
         generate();
-        int score = PlayerPrefs.GetInt("high_score", 0);
+        
+       
         generateSeedButton.onClick.AddListener(TaskOnClick);
         playButton.onClick.AddListener(PlayOnClick);
         createSeed.onClick.AddListener(CreateClick);
@@ -52,6 +58,7 @@ public class generateSeed : MonoBehaviour
         {
             instructions.gameObject.SetActive(false);
         }
+
     }
 
     void CreateClick()
