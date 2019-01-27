@@ -534,17 +534,31 @@ public class MapGenerator : MonoBehaviour
 	/// </summary>
 	private void FindAllWalls()
 	{
-		// The logic behind this method is that every "wall" in the map is sequence
-		// of wall tiles bookended by intersection points.
-		// Intersection points are where walls meet.
-		// Since the point of this method will eventually be to dissolve those wall
-		// tiles in between those intersection points, every wall tile is considered
-		// a "dissolvable" wall as long as it is not an intersection point.
-		
-		// Queue that checks every intersection point for walls they define.
-		// Queues up the top left wall tile.
-		// The dges are guaranteed to be wall tiles.
-		Queue<(int, int)> tmpIntersections = new Queue<(int, int)>();
+        // The logic behind this method is that every "wall" in the map is sequence
+        // of wall tiles bookended by intersection points.
+        // Intersection points are where walls meet.
+        // Since the point of this method will eventually be to dissolve those wall
+        // tiles in between those intersection points, every wall tile is considered
+        // a "dissolvable" wall as long as it is not an intersection point.
+
+        // Queue that checks every intersection point for walls they define.
+        // Queues up the top left wall tile.
+        // The dges are guaranteed to be wall tiles.
+
+        // Clear everything so we can call this multiple times
+        AllWalls.Clear();
+        Intersections.Clear();
+        hasThisSpaceBeenChecked = new bool[rows][];
+        for (int i = 0; i < rows; i++)
+        {
+            hasThisSpaceBeenChecked[i] = new bool[columns];
+            for (int j = 0; j < columns; j++)
+            {
+                hasThisSpaceBeenChecked[i][j] = false;
+            }
+        }
+
+        Queue<(int, int)> tmpIntersections = new Queue<(int, int)>();
 		tmpIntersections.Enqueue((0, 0));
 
 		// Tracks which tiles we are on
@@ -665,17 +679,7 @@ public class MapGenerator : MonoBehaviour
 			Intersections.Add((thisRow, thisCol));
 
 		}
-
-		Debug.Log("Walls: " + AllWalls.Count.ToString() +
-			"; Intsecs: " + Intersections.Count.ToString());
 	}
-
-    private void KnockDownSkinnyRooms()
-    {
-        int minimumNumberOfHeightOrWidth = 3;
-
-
-    }
 
     /// <summary>
     /// Counts the rooms. We'll iterate over all the cells and find the first
@@ -750,9 +754,40 @@ public class MapGenerator : MonoBehaviour
         return rooms.Count;
     }
 
-    private void KnockDownWalls()
+    private void RemoveSingleWall()
     {
-        this.KnockDownSkinnyRooms();
+        Debug.Log("Start RemoveSingleWall CountRooms(): " + CountRooms().ToString());
+
+        FindAllWalls();
+        int smallestWallIndex = -1;
+        int smallestWallLength = int.MaxValue;
+
+        for (int i = 0; i < AllWalls.Count; i++)
+        {
+            if (AllWalls[i].DissolvableWalls.Count < smallestWallLength)
+            {
+                smallestWallLength = AllWalls[i].DissolvableWalls.Count;
+                smallestWallIndex = i;
+            }
+        }
+
+        for (int i = 0; i < AllWalls[smallestWallIndex].DissolvableWalls.Count; i++) {
+            board[AllWalls[smallestWallIndex].DissolvableWalls[i].Item1][AllWalls[smallestWallIndex].DissolvableWalls[i].Item2] = TileType.Floor;
+        }
+        AllWalls[smallestWallIndex].DissolvableWalls.Clear();
+
+        Debug.Log("Finish RemoveSingleWall CountRooms(): " + CountRooms().ToString());
+    }
+
+    private void KnockDownWalls(int numberOfDesiredRooms)
+    {
+        Debug.Log("numberOfDesiredRooms: " + numberOfDesiredRooms.ToString());
+        Debug.Log("Start CountRooms(): " + CountRooms().ToString());
+        while(CountRooms() != numberOfDesiredRooms)
+        {
+            RemoveSingleWall();
+        }
+        Debug.Log("Finish CountRooms(): " + CountRooms().ToString());
     }
 
     /// <summary>
@@ -783,10 +818,7 @@ public class MapGenerator : MonoBehaviour
         this.AddOuterWalls();
         this.AddExternalDoor();
         this.GenerateRooms(numberOfRooms);
-        this.KnockDownWalls();
-
-        Debug.Log("Number of rooms: " + this.CountRooms().ToString());
-
+        this.KnockDownWalls(numberOfRooms);
         FindAllWalls();
     }
 }
